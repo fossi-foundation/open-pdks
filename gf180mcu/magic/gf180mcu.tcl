@@ -2736,11 +2736,11 @@ proc gf180mcu::ppolyf_u_draw {parameters} {
 	    plus_contact_type	nsc \
 	    sub_type		nwell \
 	    end_surround	$poly_surround \
-	    end_spacing		0.60 \
+	    end_spacing		0.73 \
 	    end_to_end_space	0.52 \
 	    res_to_endcont	$sblk_to_cont \
 	    res_spacing		$polyres_spacing \
-	    res_diff_spacing	0.60 \
+	    res_diff_spacing	0.73 \
 	    mask_clearance	0.52 \
 	    overlap_compress	0.36 \
     ]
