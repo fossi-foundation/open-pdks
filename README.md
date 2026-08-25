@@ -28,10 +28,10 @@ for handling pre-built PDKs, called Ciel (formerly called Volare).
 
 Table of Contents:
 
-- [Open PDKs Format](##open-pdks-format)
-- [Build Instructions](##build-instructions)
-- [Example Usage](##example-usage)
-- [Licenses](##licenses)
+- [Open PDKs Format](#open-pdks-format)
+- [Build Instructions](#build-instructions)
+- [Example Usage](#example-usage)
+- [Licenses](#licenses)
 
 ## Open PDKs Format
 
