@@ -1456,12 +1456,15 @@ style gdsii
 
 #------------------------------------------------------------------------
 # FILLBLOCK (NOTE: two layers define this on active, then poly & metal)
+# FILLOBS (NDMY) is not output under "fillblock" by default and if
+# required should use a mask hint.
 #------------------------------------------------------------------------
-# layer FILLOBS fillblock
-# 	calma 	111 5
+ layer FILLOBS
+ mask-hints NDMY
+ calma	111 5
 
  layer FILLOBS2 fillblock
- 	calma 	152 5
+ calma 	152 5
 
 #----------------------------------------------------------
 style metfill
@@ -1840,7 +1843,6 @@ style  import
  ignore EFUSE
  ignore SOURCE
  ignore VTEXT
- ignore FILLOBS
  ignore SCRIBE
  ignore LATCHUP_ID
  ignore IO_ID
