@@ -1839,7 +1839,6 @@ style  import
 
  options ignore-unknown-layer-labels
 
- ignore CAPDEF
  ignore EFUSE
  ignore SOURCE
  ignore VTEXT
@@ -2990,9 +2989,11 @@ style  import
  layer lvstext TTEXT
  labels TTEXT text
 
-# layer fillblock  FILLOBS,FILLOBS2
  layer fillblock  FILLOBS2
  labels FILLOBS2
+
+ templayer fillobs FILLOBS
+ mask-hints NDMY
 
 # MOS Varactors
 
