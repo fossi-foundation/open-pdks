@@ -136,8 +136,8 @@ on building the GlobalFoundries gf180MCU PDK.
 Instructions:
 
 ```
-git clone https://github.com/RTimothyEdwards/open_pdks.git
-cd open_pdks
+git clone https://github.com/fossi-foundation/open-pdks.git
+cd open-pdks
 ./configure [options]
 make
 [sudo] make install

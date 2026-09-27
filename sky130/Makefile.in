@@ -1001,9 +1001,14 @@ update-osu-t18-repo:
 
 all-%: prerequisites
 	echo "Starting sky130$* PDK staging on "`date` > ${SKY130$*}_make.log
-	${MAKE} general-$*
-	${MAKE} tools-$*
-	${MAKE} vendor-$*
+	# Run each stage in turn, reporting any fatal errors.
+	for stage in general tools vendor ; do \
+		${MAKE} $${stage}-$* 2> >(tee -a ${SKY130$*}_make.log >&2) || { \
+			echo "*** ERROR: 'make $${stage}-$*' failed; sky130$* PDK staging aborted on "`date` | \
+			tee -a ${SKY130$*}_make.log >&2 ; \
+			exit 1 ; \
+		} ; \
+	done
 	echo "Ended sky130$* PDK staging on "`date` >> ${SKY130$*}_make.log
 
 general-%: ${TECH}.json

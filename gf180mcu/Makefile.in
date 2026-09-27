@@ -772,9 +772,16 @@ update-ocd-sc-repo:
 
 all-%: prerequisites
 	echo "Starting gf180mcu$* PDK staging on "`date` > ${GF180MCU$*}_make.log
-	${MAKE} general-$*
-	${MAKE} tools-$*
-	${MAKE} vendor-$*
+	# Run each stage in turn.  Copy each sub-make's stderr (which is where
+	# make reports its own errors) to the log, and on failure write an
+	# error line to the log and stop.
+	for stage in general tools vendor ; do \
+		${MAKE} $${stage}-$* 2> >(tee -a ${GF180MCU$*}_make.log >&2) || { \
+			echo "*** ERROR: 'make $${stage}-$*' failed; gf180mcu$* PDK staging aborted on "`date` | \
+				tee -a ${GF180MCU$*}_make.log >&2 ; \
+			exit 1 ; \
+		} ; \
+	done
 	echo "Ended gf180mcu$* PDK staging on "`date` >> ${GF180MCU$*}_make.log
 
 general-%: ${TECH}.json
@@ -988,7 +995,7 @@ vendor-A: primitive-build-A digital-7t5v0-build-A digital-9t5v0-build-A io-build
 
 vendor-B: primitive-build-B digital-7t5v0-build-B digital-9t5v0-build-B io-build-B ocd-io-build-B ocd-alpha-build-B sram-build-B ocd-sram-build-B digital-osu-build-B digital-ocd-build-B digital-avalon-build-B digital-efuse-build-B
 
-vendor-C: primitive-build-C digital-7t5v0-build-C digital-9t5v0-build-C io-build-C ocd-io-build-C ocd-alpha-build-C sram-build-C ocd-sram-build-C digital-osu-build-C digital-ocd_build-C digital-avalon-build-C digital-efuse-build-C
+vendor-C: primitive-build-C digital-7t5v0-build-C digital-9t5v0-build-C io-build-C ocd-io-build-C ocd-alpha-build-C sram-build-C ocd-sram-build-C digital-osu-build-C digital-ocd-build-C digital-avalon-build-C digital-efuse-build-C
 
 vendor-D: primitive-build-D digital-7t5v0-build-D digital-9t5v0-build-D io-build-D ocd-io-build-D ocd-alpha-build-D sram-build-D ocd-sram-build-D digital-osu-build-D digital-ocd-build-D digital-avalon-build-D digital-efuse-build-D
 
