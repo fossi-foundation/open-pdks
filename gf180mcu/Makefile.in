@@ -1390,10 +1390,13 @@ digital-osu-%:
 digital-ocd-%:
 	${STAGE} -source ${GF180MCU_OCD_SC_PATH} \
 		-target ${STAGING_PATH}/${GF180MCU$*} \
-		-techlef tlef/gf180mcu_ocd_sc_rt12t3v3.tlef \
-			rename=gf180mcu_ocd_sc_rt12t3v3__nom.tlef \
-		-lib lib/*.lib compile-only \
+		-techlef tlef/*.tlef \
+		-lib lib/nom/*.lib compile-only \
 			rename=gf180mcu_ocd_sc_rt12t3v3__tt_025C_3v30 \
+		-lib lib/max/*.lib compile-only \
+			rename=gf180mcu_ocd_sc_rt12t3v3__ss_125C_3v00 \
+		-lib lib/min/*.lib compile-only \
+			rename=gf180mcu_ocd_sc_rt12t3v3__ff_n40C_3v60 \
 		-verilog verilog/*.v rename=gf180mcu_ocd_sc_rt12t3v3.v \
 		-lef lef/*.lef compile-only \
 		-gds gds/*.gds compile-only \

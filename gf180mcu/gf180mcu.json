@@ -112,7 +112,7 @@
         "gf180mcu_ocd_io": "6e0e354a78793339a4a004a6d9c08990d0eee3e4",
         "gf180mcu_ocd_alpha": "0597ebd5732987dbcd149e02c38525c1c5bf2a58",
         "gf180mcu_ocd_ip_sram": "efdbf734d806c2ac3b858d281a5b832625a8e928",
-	"gf180mcu_ocd_sc_rt12t3v3": "68a742de7c58c0927a06f507ddf510b9716fc288",
+	"gf180mcu_ocd_sc_rt12t3v3": "9f1b40f88a3c8e650ea905ebcaee40dfa42e8020",
         "gf180mcu_osu_sc_gf12t3v3": "8a2f58f283a2eaa725314c9e1b8b7d1d343f23a3",
         "gf180mcu_osu_sc_gf9t3v3": "8a2f58f283a2eaa725314c9e1b8b7d1d343f23a3"
     }
