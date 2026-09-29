@@ -45,3 +45,4 @@ set ::env(TRISTATE_CELLS) "$::env(STD_CELL_LIBRARY)__bufz*"
 
 set ::env(SYNTH_CLOCKGATE_POSEDGE_ICG) "$::env(STD_CELL_LIBRARY)__icgtp_1/E/CLK/Q"
 set ::env(SYNTH_CLOCKGATE_NEGEDGE_ICG) "$::env(STD_CELL_LIBRARY)__icgtn_1/E/CLKN/Q"
+set ::env(SYNTH_CLOCKGATE_TIE_LO) "TE"
