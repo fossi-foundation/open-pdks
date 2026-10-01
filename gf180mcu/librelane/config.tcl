@@ -187,24 +187,30 @@ set ::env(LAYERS_RC) [dict create]
 
 # RC fit from OpenROAD
 # https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/master/flow/platforms/gf180/setRC.tcl
-dict set ::env(LAYERS_RC) "*" Metal2 res 3.85861E-04
+dict set ::env(LAYERS_RC) "*" Metal2 res 2.25636E-04
 dict set ::env(LAYERS_RC) "*" Metal2 cap 1.35357E-04
-dict set ::env(LAYERS_RC) "*" Metal3 res 2.06673E-04
+dict set ::env(LAYERS_RC) "*" Metal3 res 2.25636E-04
 dict set ::env(LAYERS_RC) "*" Metal3 cap 1.46141E-04
-dict set ::env(LAYERS_RC) "*" Metal4 res 1.68609E-04
+dict set ::env(LAYERS_RC) "*" Metal4 res 2.25636E-04
 dict set ::env(LAYERS_RC) "*" Metal4 cap 1.50688E-04
-dict set ::env(LAYERS_RC) "*" Metal5 res 7.92778E-05
+dict set ::env(LAYERS_RC) "*" Metal5 res 5.85545E-05
 dict set ::env(LAYERS_RC) "*" Metal5 cap 1.55595E-04
 
 set ::env(VIAS_R) [dict create]
 
-# Best case (and used for nom)
-dict set ::env(VIAS_R) "*" Via1 res 4.23
-dict set ::env(VIAS_R) "*" Via2 res 4.23
-dict set ::env(VIAS_R) "*" Via3 res 4.23
-dict set ::env(VIAS_R) "*" Via4 res 4.23
+# Nominal case
+dict set ::env(VIAS_R) "nom_*" Via1 res 4.5
+dict set ::env(VIAS_R) "nom_*" Via2 res 4.5
+dict set ::env(VIAS_R) "nom_*" Via3 res 4.5
+dict set ::env(VIAS_R) "nom_*" Via4 res 4.5
 
-# Worst case (last one wins)
+# Best case
+dict set ::env(VIAS_R) "min_*" Via1 res 4.23
+dict set ::env(VIAS_R) "min_*" Via2 res 4.23
+dict set ::env(VIAS_R) "min_*" Via3 res 4.23
+dict set ::env(VIAS_R) "min_*" Via4 res 4.23
+
+# Worst case
 dict set ::env(VIAS_R) "max_*" Via1 res 16.845
 dict set ::env(VIAS_R) "max_*" Via2 res 16.845
 dict set ::env(VIAS_R) "max_*" Via3 res 16.845
