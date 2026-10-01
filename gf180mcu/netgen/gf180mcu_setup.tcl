@@ -470,6 +470,21 @@ foreach cell $cells2 {
     }
 }
 
+# For the OCD rt12t3v3 standard cells, only the fill cells need to be
+# handled.
+
+foreach cell $cells1 {
+    if {[regexp {gf180mcu_ocd_sc_[^_]+__fill_[[:digit:]]+} $cell match]} {
+        ignore class "-circuit1 $cell"
+    }
+}
+
+foreach cell $cells2 {
+    if {[regexp {gf180mcu_ocd_sc_[^_]+__fill_[[:digit:]]+} $cell match]} {
+        ignore class "-circuit2 $cell"
+    }
+}
+
 #---------------------------------------------------------------
 # Allow the fill, decap, etc., cells to be parallelized
 #---------------------------------------------------------------
@@ -514,13 +529,13 @@ foreach cell $cells2 {
 
 foreach cell $cells1 {
     if {[regexp {gf180mcu_osu_sc_[^_]+__fill_[[:digit:]]+} $cell match]} {
-        property "-circuit1 $cell" parallel enable
+	property "-circuit1 $cell" parallel enable
     }
 }
 
 foreach cell $cells2 {
     if {[regexp {gf180mcu_osu_sc_[^_]+__fill_[[:digit:]]+} $cell match]} {
-        property "-circuit2 $cell" parallel enable
+	property "-circuit2 $cell" parallel enable
     }
 }
 
@@ -547,6 +562,26 @@ foreach cell $cells2 {
     }
     if {[regexp {gf180mcu_as_sc_[^_]+__decap_[[:digit:]]+} $cell match]} {
         property "-circuit2 $cell" parallel enable
+    }
+}
+
+# And the Open Circuit Design rt12t3v3 standard cell library.
+
+foreach cell $cells1 {
+    if {[regexp {gf180mcu_ocd_sc_[^_]+__fill_[[:digit:]]+} $cell match]} {
+	property "-circuit1 $cell" parallel enable
+    }
+    if {[regexp {gf180mcu_ocd_sc_[^_]+__decap_[[:digit:]]+} $cell match]} {
+	property "-circuit1 $cell" parallel enable
+    }
+}
+
+foreach cell $cells2 {
+    if {[regexp {gf180mcu_ocd_sc_[^_]+__fill_[[:digit:]]+} $cell match]} {
+	property "-circuit2 $cell" parallel enable
+    }
+    if {[regexp {gf180mcu_ocd_sc_[^_]+__decap_[[:digit:]]+} $cell match]} {
+	property "-circuit2 $cell" parallel enable
     }
 }
 

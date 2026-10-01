@@ -190,16 +190,22 @@ def remove_target(stagingdir, targetdir, verbose=False):
 
     for sfile in slist:
         if sfile in tlist:
+            spath = stagingdir + '/' + sfile
             tpath = targetdir + '/' + sfile
             if os.path.islink(tpath):
                 if verbose:
                     print("Removing link", tpath)
                 os.unlink(tpath)
             elif os.path.isdir(tpath):
-                remove_target(
-                    stagingdir + '/' + sfile,
-                    targetdir + '/' + sfile,
-                    verbose)
+                if os.path.isdir(spath) and not os.path.islink(spath):
+                    remove_target(spath, tpath, verbose)
+                else:
+                    # Target is a directory but staging has a file or a
+                    # symbolic link in its place, so the whole directory
+                    # must be removed for the copy to succeed.
+                    if verbose:
+                        print("Removing directory", tpath)
+                    shutil.rmtree(tpath)
             else:
                 if verbose:
                     print("Removing", tpath)

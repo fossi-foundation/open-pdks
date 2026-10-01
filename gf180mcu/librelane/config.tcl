@@ -131,10 +131,11 @@ set ::env(PDN_CORE_RING_HSPACING) 1.7
 set ::env(PDN_CORE_RING_VOFFSET) 6
 set ::env(PDN_CORE_RING_HOFFSET) 6
 
-# Timing
-set ::env(RCX_RULES) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rules.openrcx.$::env(PDK).nom"
-set ::env(RCX_RULES_MIN) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rules.openrcx.$::env(PDK).min"
-set ::env(RCX_RULES_MAX) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rules.openrcx.$::env(PDK).max"
+# Open-RCX Rules File
+set ::env(RCX_RULESETS) [dict create]
+dict set ::env(RCX_RULESETS) nom_* "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rules.openrcx.$::env(PDK).nom"
+dict set ::env(RCX_RULESETS) min_* "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rules.openrcx.$::env(PDK).min"
+dict set ::env(RCX_RULESETS) max_* "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/librelane/rules.openrcx.$::env(PDK).max"
 
 # Routing
 set ::env(METAL_LAYER_NAMES) "Metal1 Metal2 Metal3 Metal4 Metal5"

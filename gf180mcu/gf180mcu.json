@@ -67,6 +67,7 @@
         "gf180mcu_fd_sc_mcu7t5v0": "FD_SC_MCU7T5V0_COMMIT",
         "gf180mcu_osu_sc_gf12t3v3": "OSU_SC_COMMIT",
         "gf180mcu_osu_sc_gf9t3v3": "OSU_SC_COMMIT",
+	"gf180mcu_ocd_sc_rt12t3v3": "OCD_SC_COMMIT",
         "gf180mcu_as_sc_mcu7t3v3": "AS_SC_MCU7T3V3_COMMIT"
     },
     "iocells": {
@@ -111,6 +112,7 @@
         "gf180mcu_ocd_io": "6e0e354a78793339a4a004a6d9c08990d0eee3e4",
         "gf180mcu_ocd_alpha": "0597ebd5732987dbcd149e02c38525c1c5bf2a58",
         "gf180mcu_ocd_ip_sram": "efdbf734d806c2ac3b858d281a5b832625a8e928",
+	"gf180mcu_ocd_sc_rt12t3v3": "c4c8cf2548f3d391163081c870b6410ae521b33d",
         "gf180mcu_osu_sc_gf12t3v3": "8a2f58f283a2eaa725314c9e1b8b7d1d343f23a3",
         "gf180mcu_osu_sc_gf9t3v3": "8a2f58f283a2eaa725314c9e1b8b7d1d343f23a3"
     }

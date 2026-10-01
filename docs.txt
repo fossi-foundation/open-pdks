@@ -1,13 +1,19 @@
-open_pdks : A system for installing silicon foundry PDKs for open-source EDA tools
+open-pdks : A system for installing silicon foundry PDKs for open-source EDA tools
 (also maybe works for installing commercial tools)
 
 ----------------------------------------------------------------------------------
 
 Written by Tim Edwards 2019 - 2025 for efabless (efabless.com)
 and Open Circuit Design (opencircuitdesign.com)
+Given to the FOSSi Foundation (fossi-foundation.org) in 2026 for safekeeping.
 
-URL: http://opencircuitdesign.com/open_pdks
-Mirror URL: https://github.com/RTimothyEdwards/open_pdks
+Note that the transfer to FOSSi Foundation's github account coincided with
+a name change from "open_pdks" to "open-pdks".
+
+URL: https://github.com/fossi-foundation/open-pdks
+
+Original URL: https://opencircuitdesign.com/open_pdks
+Original mirror URL: https://github.com/RTimothyEdwards/open_pdks
 
 Distributed under the Apache-2.0 license (see file LICENSE).
 
@@ -20,7 +26,7 @@ Quick Install:
     files for open source EDA tools?  Read the README.md file or the
     README file in the sky130/ or gf180mcu/ directories.
 
-    The rest of this README file is general information about open_pdks
+    The rest of this README file is general information about open-pdks
     and is not specific to any single PDK.
 
 ----------------------------------------------------------------------------------
@@ -44,11 +50,11 @@ Introduction:
     is intractably unusable, custom install files can be added to overwrite
     or annotate vendor data as needed.
 
-    Each foundry process is a subdirectory of the open_pdks top level and
+    Each foundry process is a subdirectory of the open-pdks top level and
     has its own Makefile.  The typical install process is to cd to the
     foundry top level and run "make" (see below for details).
 
-    The general file structure created by open_pdks is as follows:
+    The general file structure created by open-pdks is as follows:
 
 	<foundry_root>/
 	    <name_of_pdk_variant_1>/
@@ -75,10 +81,10 @@ Introduction:
     Note that this format is very general and does not constrain the
     EDA tools supported or file formats supported, so long as there
     are scripts in the system to provide that support.  It is intended
-    that open_pdks can be extended as needed to support new tools or
+    that open-pdks can be extended as needed to support new tools or
     new file formats.
 
-    Current EDA tools supported in this version of open_pdks:
+    Current EDA tools supported in this version of open-pdks:
 	Tool	    Directory name
 	--------------------------
 	ngspice	    ngspice
@@ -88,7 +94,7 @@ Introduction:
 	qflow	    qflow
 	librelane   librelane
 
-    Current IP library file formats supported in this version of open_pdks*:
+    Current IP library file formats supported in this version of open-pdks*:
 	Format	    Directory name
 	--------------------------
 	CDL	    cdl
@@ -105,14 +111,14 @@ Introduction:
 	   can be used as a target for any vendor or custom files.)
 	(** or HTML or any valid document format, plus supporting files.)
 
-How to use open_pdks:
+How to use open-pdks:
 
     There are a seriously limited number of open foundry PDKs.  Those that
     are known (SkyWater, MOSIS SCMOS) are included in the repository.  In
     other cases (X-Fab XH035, XH018) it is possible to get an extension to
-    open_pdks from a known trusted source through NDA verification with
+    open-pdks from a known trusted source through NDA verification with
     the foundry.  In all other cases, foundries should be berated until
-    they agree to support the open_pdks format.
+    they agree to support the open-pdks format.
 
     Open_pdks does not attempt to keep any foundry data to the extent
     possible.  Instead, it adapts to the file structure available from
@@ -120,7 +126,7 @@ How to use open_pdks:
     directory should contain a README file that details how to obtain
     downloads from the foundry, and what files need to be downloaded.
     Since the download methods vary wildly, it is up to the user to obtain
-    the foundry data as instructed.  The Makefile in the open_pdks foundry
+    the foundry data as instructed.  The Makefile in the open-pdks foundry
     directory then needs to be edited to set the correct path to the
     foundry source data.
 
@@ -183,7 +189,7 @@ How to use open_pdks:
 
 Prerequisites:
 
-    The following tools/software stacks are needed to run open_pdks:
+    The following tools/software stacks are needed to run open-pdks:
 
 	python3
 
@@ -194,7 +200,7 @@ Prerequisites:
 
 How to make or update an open PDK:
 
-    The backbone of the open_pdks system is a set of scripts found in the
+    The backbone of the open-pdks system is a set of scripts found in the
     common/ subdirectory.  The two main scripts are "preproc.py" and
     "foundry_install.py", with a host of supporting scripts.
 
@@ -214,7 +220,7 @@ How to make or update an open PDK:
     Create the basic scripts for tools.  Since foundries do not support open
     EDA tools, it is inevitable that these files need to be created by hand
     unless there is an option to import other formats.  Because Magic is used
-    heavily by open_pdks to create missing file formats from other existing
+    heavily by open-pdks to create missing file formats from other existing
     file formats, a Magic techfile is critical.  Each of the basic scripts
     will contain #ifdef ... #endif and similar conditionals to allow the
     script to be parsed for each target PDK variant.  Each of these scripts
@@ -335,7 +341,7 @@ How to make or update an open PDK:
 
 	 "*" has the usual meaning of matching any characters in a name (see
 	 python glob.glob() command for reference).  However, for backwards
-	 compatibility with earlier versions of open_pdks, the library name
+	 compatibility with earlier versions of open-pdks, the library name
          in the path may also be wildcarded with "*" in the specific text
 	 "/*/".
 
@@ -497,7 +503,7 @@ How to make or update an open PDK:
 			   cell library, or netlist to a form that is
 			   compatible with ngspice version 30.
 
-    open_pdks additional Makefile notes:
+    open-pdks additional Makefile notes:
 
 	The "make install-local" ("make install-dist") step is generally
 	broken into individual make sections, one for each tool (e.g.,
@@ -530,9 +536,9 @@ How to make or update an open PDK:
 	option name itself is ignored by the pre-processor.
 
 
-Goals of the open_pdks project:
+Goals of the open-pdks project:
 
-    The intended goal of open_pdks is to be able to support as many open source
+    The intended goal of open-pdks is to be able to support as many open source
     EDA tools as practical, and to be able to generate all needed files for
     those tools from any sufficiently complete set of vendor files.
 
@@ -573,12 +579,12 @@ Goals of the open_pdks project:
 
 	    Project setup script:  It would be useful to define a "standard
 	    project file structure" that is similar to the standard PDK file
-	    structure defined in open_pdks.  The preferred project setup
+	    structure defined in open-pdks.  The preferred project setup
 	    based on the efabless model is:
 
 		<project_name>
 		    .config/
-			techdir (symbolic link to open_pdks PDK)
+			techdir (symbolic link to open-pdks PDK)
 		    project.json    (information file for tools)
 		    <tool_name>	    (magic, qflow, ngspice, etc.) or
 		    <format_name>   (spice, gds, verilog, etc.)
@@ -588,7 +594,7 @@ Goals of the open_pdks project:
 	    e.g., qflow/<digital_block>/source,synthesis,layout) while
 	    <format_name> is a place to keep (final) files of a specific format,
 	    with the intention that any project can easily be made into an
-	    IP library and folded into the open_pdks scheme with little effort.
+	    IP library and folded into the open-pdks scheme with little effort.
 
 	    The project.json file contains project information that can be used
 	    by a script to build a setup for any EDA tool.  One goal of the
