@@ -684,6 +684,16 @@ compose
   paint  nsd     pwell  psd
   paint  nsc     pwell  psc
   paint  ldpdiff pwell  ldndiff
+  paint  mvndc   nwell  mvpdc
+  paint  mvnfet  nwell  mvpfet
+  paint  mvndiff nwell  mvpdiff
+  paint  mvpsd   nwell  mvnsd
+  paint  mvpsc   nwell  mvnsc
+  paint  mvpdc   pwell  mvndc
+  paint  mvpfet  pwell  mvnfet
+  paint  mvpdiff pwell  mvndiff
+  paint  mvnsd   pwell  mvpsd
+  paint  mvnsc   pwell  mvpsc
 
   paint  m1      obsm1  m1
   paint  m2      obsm2  m2
