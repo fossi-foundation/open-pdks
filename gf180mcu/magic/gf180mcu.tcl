@@ -1060,7 +1060,7 @@ proc gf180mcu::diode_pd2nw_06v0_draw {parameters} {
 
 #ifdef MIM
 proc gf180mcu::cap_mim_2p0fF_defaults {} {
-    return {w 5.00 l 5.00 val 50.000 carea 25.00 cperi 20.00 \
+    return {w 5.00 l 5.00 val 54.516 carea 1.99 cperi 0.2383 \
 		class capacitor \
 		nx 1 ny 1 dummy 0 square 0 lmin 5.00 wmin 5.00 \
 		lmax 100.0 wmax 100.0 dc 0 bconnect 1 tconnect 1}
@@ -1096,8 +1096,8 @@ proc gf180mcu::cap_recalc {field parameters} {
 #  nx     Number of devices in X
 #  ny     Number of devices in Y
 #  val    Default cap value
-#  carea  Area
-#  cperi  Perimeter
+#  carea  Area capacitance (per um^2)
+#  cperi  Perimeter capacitange (per um)
 #  dummy  Add dummy cap
 #  square Make square capacitor
 #
