@@ -3398,9 +3398,9 @@ drc
 	"Diffusion contact spacing < %d (CO.2a - 2 * CO.6)"
  spacing pc pc 240 touching_ok "Poly contact spacing < %d (CO.2a - 2 * CO.6)"
  spacing pc alldiff 165 touching_illegal \
-	"Poly contact spacing to diffusion < %d (CO.8 - 2 * CO.6)"
+	"Poly contact spacing to diffusion < %d (CO.8 - CO.6)"
  spacing allpdiffcont,allndiffcont allpoly 145 touching_illegal \
-	"Diffusion contact spacing to poly < %d (CO.7 - 2 * CO.6)"
+	"Diffusion contact spacing to poly < %d (CO.7 - CO.6)"
 
  exact_overlap (ndc,pdc,psc,nsc,pc,ndic,pdic)/a
  exact_overlap (mvndc,mvpdc,mvpsc,mvnsc,mvndic,mvnndic,mvpdic)/a
