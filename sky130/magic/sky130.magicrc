@@ -56,26 +56,19 @@ set VDD VPWR
 set GND VGND
 set SUB VSUBS
 
-# Allow override of type of magic library views used, "mag" or "maglef",
-# from environment variable MAGTYPE
-
-if {[catch {set MAGTYPE $env(MAGTYPE)}]} {
-   set MAGTYPE mag
-}
-
 # add path to reference cells
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_pr/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_io/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_hd/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_hdll/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_hs/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_hvl/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_lp/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_ls/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_ms/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_osu_sc/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_osu_sc_t18/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_ml_xx_hd/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_bd_sram/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_sram_macros/${MAGTYPE}
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_pr/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_io/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_hd/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_hdll/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_hs/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_hvl/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_lp/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_ls/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_sc_ms/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_osu_sc/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_osu_sc_t18/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_ml_xx_hd/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_fd_bd_sram/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/sky130_sram_macros/mag
 

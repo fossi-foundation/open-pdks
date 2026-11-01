@@ -1261,7 +1261,7 @@ digital-9t5v0-%:
 		-gds cells/*/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
 			filter=custom/scripts/fix_stdcell_gds.py \
-		-lef cells/*/*.lef annotate compile-only \
+		-lef cells/*/*.lef annotate compile-only noconvert \
 			filter=custom/scripts/fix_digital_lef.py \
 		-verilog models/*/*.v compile-only rename=primitives \
 		-verilog cells/*/*.v exclude=*.*.v,primitives.v \
@@ -1345,7 +1345,7 @@ digital-7t5v0-%:
 		-gds cells/*/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
 			filter=custom/scripts/fix_stdcell_gds.py \
-		-lef cells/*/*.lef annotate compile-only \
+		-lef cells/*/*.lef annotate compile-only noconvert \
 			filter=custom/scripts/fix_digital_lef.py \
 		-verilog models/*/*.v compile-only rename=primitives \
 		-verilog cells/*/*.v exclude=*.*.v,primitives.v \
@@ -1366,7 +1366,7 @@ digital-osu-%:
 		-lib lib/gf180mcu_osu_sc_gp9t3v3_TT_25C.ccs.lib \
 			rename=gf180mcu_osu_sc_gp9t3v3__tt_025C_3v30 \
 		-verilog verilog/*.v rename=gf180mcu_osu_sc_gp9t3v3.v \
-		-lef lef/*.lef \
+		-lef lef/*.lef noconvert \
 		-gds gds/*.gds compile-only \
 		-spice spice/*.spice \
 		-xschem xschem/*.sch compile-only \
@@ -1380,7 +1380,7 @@ digital-osu-%:
 		-lib lib/gf180mcu_osu_sc_gp12t3v3_TT_25C.ccs.lib \
 			rename=gf180mcu_osu_sc_gp12t3v3__tt_025C_3v30 \
 		-verilog verilog/*.v rename=gf180mcu_osu_sc_gp12t3v3.v \
-		-lef lef/*.lef \
+		-lef lef/*.lef noconvert \
 		-gds gds/*.gds compile-only \
 		-spice spice/*.spice \
 		-xschem xschem/*.sch \
@@ -1398,7 +1398,7 @@ digital-ocd-%:
 		-lib lib/min/*.lib compile-only \
 			rename=gf180mcu_ocd_sc_rt12t3v3__ff_n40C_3v60 \
 		-verilog verilog/*.v rename=gf180mcu_ocd_sc_rt12t3v3.v \
-		-lef lef/*.lef compile-only \
+		-lef lef/*.lef compile-only noconvert \
 		-gds gds/*.gds compile-only \
 		-spice netlist/schematic/*.spice compile-only \
 		-xschem xschem/*.sch \
@@ -1493,7 +1493,7 @@ io-%:
 		-gds %l/gds/*_${$*_STACK}.gds compile-only \
 			rename=gf180mcu_ef_io \
 			options=custom/scripts/gds_import_io.tcl \
-		-lef %l/lef/*_${$*_STACK}.lef \
+		-lef %l/lef/*_${$*_STACK}.lef noconvert \
 			annotate lefopts=-hide \
 		-library general gf180mcu_fd_io 2>&1 | \
 		tee -a ${GF180MCU$*}_make.log
@@ -1559,7 +1559,7 @@ io-%:
 		-gds cells/*/*_${$*_STACK}.gds compile-only \
 			options=custom/scripts/gds_import_io.tcl \
 			filter=custom/scripts/fix_io_cor_gds.py \
-		-lef cells/*/*_${$*_STACK}.lef \
+		-lef cells/*/*_${$*_STACK}.lef noconvert \
 			annotate lefopts=-hide \
 		-xschem cells/*/*.sym \
 			filter=custom/scripts/make_primitive.py \
@@ -1611,7 +1611,7 @@ ocd-io-%:
 		-spice netlist/schematic/*.spice compile-only  \
 		-gds cells/*/*_${$*_STACK}.gds.gz compile-only \
 			options=custom/scripts/gds_import_io.tcl \
-		-lef cells/*/*_${$*_STACK}.lef compile-only \
+		-lef cells/*/*_${$*_STACK}.lef compile-only noconvert \
 		-xschem cells/*/*.sym \
 			filter=custom/scripts/make_primitive.py \
 		-verilog cells/*/*__blackbox.v rename=gf180mcu_ocd_io__blackbox.v compile-only \
@@ -1653,7 +1653,7 @@ sram-%:
 		-gds cells/*/*.gds \
 			options=custom/scripts/gds_import_sram.tcl \
 			filter=custom/scripts/fix_sram_gds.py \
-		-lef cells/*/*.lef annotate lefopts="-hide 5um" \
+		-lef cells/*/*.lef annotate lefopts="-hide 5um" noconvert \
 		-verilog cells/*/*.v exclude=*__blackbox*.v \
 		-verilog cells/*/*__blackbox.v \
 		-verilog cells/*/*__blackbox_pp.v \
@@ -1671,7 +1671,7 @@ ocd-sram-%:
 		-spice cells/*/*.spice \
 		-gds cells/*/*.gds \
 			options=custom/scripts/gds_import_ocd_sram.tcl \
-		-lef cells/*/*.lef \
+		-lef cells/*/*.lef noconvert \
 		-verilog cells/*/*.v exclude=*__blackbox*.v \
 		-verilog cells/*/*__blackbox.v \
 		-verilog cells/*/*__blackbox_pp.v \

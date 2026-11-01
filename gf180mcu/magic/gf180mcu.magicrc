@@ -44,20 +44,14 @@ set VDD VDD
 set GND VSS
 set SUB VSUBS
 
-# Allow override of type of magic library views used, "mag" or "maglef",
-# from environment variable MAGTYPE
-
-if {[catch {set MAGTYPE $env(MAGTYPE)}]} {
-   set MAGTYPE mag
-}
-
 # add path to reference cells
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_pr/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_sc_mcu7t5v0/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_sc_mcu9t5v0/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_io/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_ip_sram/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_as_sc_mcu7t3v3/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_ocd_io/${MAGTYPE}
-addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_ocd_ip_sram/${MAGTYPE}
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_pr/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_sc_mcu7t5v0/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_sc_mcu9t5v0/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_io/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_fd_ip_sram/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_as_sc_mcu7t3v3/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_ocd_io/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_ocd_ip_sram/mag
+addpath ${PDK_ROOT}/TECHNAME/libs.ref/gf180mcu_ocd_sc_rt12t3v3/mag
 
