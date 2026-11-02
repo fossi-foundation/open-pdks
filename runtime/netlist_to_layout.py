@@ -360,7 +360,6 @@ if __name__ == '__main__':
         generate_layout_end(ofile)
 
     myenv = os.environ.copy()
-    myenv['MAGTYPE'] = 'mag'
 
     # Run the layout generator
     mproc = subprocess.run(['magic', '-dnull', '-noconsole', '-rcfile',

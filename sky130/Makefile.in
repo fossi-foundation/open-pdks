@@ -1499,7 +1499,7 @@ primitive-%:
 	${STAGE} -source ${SKY130_PR_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-gds cells/*/*.gds compile-only \
 			options=custom/scripts/gds_import_setup.tcl \
-		-lef cells/*/*.magic.lef compile-only \
+		-lef cells/*/*.magic.lef compile-only noconvert \
 		-spice cells/*/*.spice filter=custom/scripts/rename_cells.py \
 		-library primitive sky130_fd_pr 2>&1 | tee -a ${SKY130$*}_make.log
 
@@ -1517,8 +1517,8 @@ io-%:
 		-lib %l/lib/*.lib \
 		-gds %l/gds/*.gds options=custom/scripts/gds_import_io.tcl \
 		-lef %l/lef/*.lef exclude=sky130_fd_io__top_xres4v2.lef,sky130_fd_io__top_power_hvc_wpadv2.lef,sky130_fd_io__top_gpiov2.lef \
-			compile-only rename=sky130_ef_io \
-		-lef %l/lef/sky130_fd_io__top_*.lef \
+			compile-only noconvert rename=sky130_ef_io \
+		-lef %l/lef/sky130_fd_io__top_*.lef noconvert \
 		-library general sky130_fd_io 2>&1 | tee -a ${SKY130$*}_make.log
 
 	# Install SkyWater I/O pad library
@@ -1526,7 +1526,7 @@ io-%:
 		-cdl cells/*/*.cdl ignore=topography compile-only \
 			include=custom/sky130_fd_io/cdl/*.cdl \
 			sort=../common/sort_pdkfiles.py \
-		-lef cells/*/*.lef annotate lefopts=-hide compile-only \
+		-lef cells/*/*.lef annotate lefopts=-hide compile-only noconvert \
 			filter=custom/scripts/fix_io_lef.py \
 			no-copy=sky130_fd_io__top_xres4v2.lef,sky130_fd_io__top_gpiov2.lef \
 			include=sky130_fd_io__top_xres4v2.lef,sky130_fd_io__top_power_hvc_wpadv2.lef,sky130_fd_io__top_gpiov2.lef \
@@ -1560,7 +1560,7 @@ digital-hd-%:
 	# Install custom additions to standard cell libraries
 	${STAGE} -source ./custom -target ${STAGING_PATH}/${SKY130$*} \
 		-gds %l/gds/*.gds options=custom/scripts/gds_import_sc.tcl \
-		-lef %l/lef/*.lef compile-only rename=sky130_ef_sc_hd.lef \
+		-lef %l/lef/*.lef compile-only rename=sky130_ef_sc_hd.lef noconvert \
 		-verilog %l/verilog/*.v \
 		-library digital sky130_fd_sc_hd 2>&1 | tee -a ${SKY130$*}_make.log
 	# Install all SkyWater digital standard cells.
@@ -1572,7 +1572,7 @@ digital-hd-%:
 			sort=../common/sort_pdkfiles.py \
 		-lef cells/*/*.lef \
 			exclude=*.magic.lef,sky130_ef_sc_hd.lef lefopts=-toplayer \
-			annotate compile-only \
+			annotate compile-only noconvert \
 			sort=../common/sort_pdkfiles.py \
 		-doc cells/*/*.pdf \
 		-lib timing/*.lib.part* collate \
@@ -1621,7 +1621,7 @@ digital-hdll-%:
 			sort=../common/sort_pdkfiles.py \
 		-cdl cells/*/*.cdl ignore=topography compile-only \
 			sort=../common/sort_pdkfiles.py \
-		-lef cells/*/*.lef annotate compile-only \
+		-lef cells/*/*.lef annotate compile-only noconvert \
 			exclude=*.magic.lef lefopts=-toplayer \
 			sort=../common/sort_pdkfiles.py \
 		-doc cells/*/*.pdf \
@@ -1659,7 +1659,7 @@ digital-hvl-%:
 			sort=../common/sort_pdkfiles.py \
 		-cdl cells/*/*.cdl ignore=topography compile-only \
 			sort=../common/sort_pdkfiles.py \
-		-lef cells/*/*.lef annotate compile-only \
+		-lef cells/*/*.lef annotate compile-only noconvert \
 			exclude=*.magic.lef lefopts=-toplayer \
 			sort=../common/sort_pdkfiles.py \
 		-doc cells/*/*.pdf \
@@ -1698,7 +1698,7 @@ digital-lp-%:
 			sort=../common/sort_pdkfiles.py \
 		-cdl cells/*/*.cdl ignore=topography compile-only \
 			sort=../common/sort_pdkfiles.py \
-		-lef cells/*/*.lef annotate compile-only \
+		-lef cells/*/*.lef annotate compile-only noconvert \
 			exclude=*.magic.lef lefopts=-toplayer \
 			sort=../common/sort_pdkfiles.py \
 		-doc cells/*/*.pdf \
@@ -1733,7 +1733,7 @@ digital-hs-%:
 			sort=../common/sort_pdkfiles.py \
 		-cdl cells/*/*.cdl ignore=topography compile-only \
 			sort=../common/sort_pdkfiles.py \
-		-lef cells/*/*.lef annotate compile-only \
+		-lef cells/*/*.lef annotate compile-only noconvert \
 			exclude=*.magic.lef lefopts=-toplayer \
 			sort=../common/sort_pdkfiles.py \
 		-doc cells/*/*.pdf \
@@ -1768,7 +1768,7 @@ digital-ms-%:
 			sort=../common/sort_pdkfiles.py \
 		-cdl cells/*/*.cdl ignore=topography compile-only \
 			sort=../common/sort_pdkfiles.py \
-		-lef cells/*/*.lef annotate compile-only \
+		-lef cells/*/*.lef annotate compile-only noconvert \
 			exclude=*.magic.lef lefopts=-toplayer \
 			sort=../common/sort_pdkfiles.py \
 		-doc cells/*/*.pdf \
@@ -1803,7 +1803,7 @@ digital-ls-%:
 			sort=../common/sort_pdkfiles.py \
 		-cdl cells/*/*.cdl ignore=topography compile-only \
 			sort=../common/sort_pdkfiles.py \
-		-lef cells/*/*.lef annotate compile-only \
+		-lef cells/*/*.lef annotate compile-only noconvert \
 			exclude=*.magic.lef lefopts=-toplayer \
 			sort=../common/sort_pdkfiles.py \
 		-doc cells/*/*.pdf \
@@ -1846,7 +1846,7 @@ sram-%:
 	# To do:  Add option to process each GDS file individually in magic,
 	# instead of all at once.
 	${STAGE} -source ${SRAM_PATH}/.. -target ${STAGING_PATH}/${SKY130$*} \
-		-lef %l/*/*.lef \
+		-lef %l/*/*.lef noconvert \
 		-lib %l/*/*.lib \
 		-gds %l/*/*.gds options=custom/scripts/gds_import_sram.tcl \
 		-spice %l/*/*.lvs.sp filter=custom/scripts/sp_to_spice.py \
@@ -1864,7 +1864,7 @@ sram-space-%:
 		-gds %l/cells/*/*.gds compile-only \
 			no-copy=custom/sky130_fd_bd_sram/*.gds \
 			include=custom/sky130_fd_bd_sram/*.gds \
-		-lef %l/cells/*/*.lef compile-only \
+		-lef %l/cells/*/*.lef compile-only noconvert \
 		-spice %l/cells/*/*.lvs.calibre.spice compile-only \
 		-library general sky130_fd_bd_sram 2>&1 | tee -a ${SKY130$*}_make.log
 
@@ -1883,7 +1883,7 @@ osu-t12-%:
 	${STAGE} -source ${OSU_T12_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-techlef sky130_osu_sc_12T.tlef rename=sky130_osu_sc_12t_hs.tlef \
 		-spice 12T_hs/cdl/*.spice compile-only exclude=*.*.spice \
-		-lef 12T_hs/lef/*.lef \
+		-lef 12T_hs/lef/*.lef noconvert \
 		-lib 12T_hs/lib/*.lib \
 		-gds 12T_hs/gds/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
@@ -1892,7 +1892,7 @@ osu-t12-%:
 	${STAGE} -source ${OSU_T12_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-techlef sky130_osu_sc_12T.tlef rename=sky130_osu_sc_12t_ms.tlef \
 		-spice 12T_ms/cdl/*.spice compile-only exclude=*.*.spice \
-		-lef 12T_ms/lef/*.lef \
+		-lef 12T_ms/lef/*.lef noconvert \
 		-lib 12T_ms/lib/*.lib \
 		-gds 12T_ms/gds/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
@@ -1901,7 +1901,7 @@ osu-t12-%:
 	${STAGE} -source ${OSU_T12_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-techlef sky130_osu_sc_12T.tlef rename=sky130_osu_sc_12t_ls.tlef \
 		-spice 12T_ls/cdl/*.spice compile-only exclude=*.*.spice \
-		-lef 12T_ls/lef/*.lef \
+		-lef 12T_ls/lef/*.lef noconvert \
 		-lib 12T_ls/lib/*.lib \
 		-gds 12T_ls/gds/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
@@ -1912,7 +1912,7 @@ osu-t15-%:
 	${STAGE} -source ${OSU_T15_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-techlef sky130_osu_sc_15T.tlef rename=sky130_osu_sc_15t_hs.tlef \
 		-spice 15T_hs/cdl/*.spice compile-only exclude=*.*.spice \
-		-lef 15T_hs/lef/*.lef \
+		-lef 15T_hs/lef/*.lef noconvert \
 		-lib 15T_hs/lib/*.lib \
 		-gds 15T_hs/gds/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
@@ -1921,7 +1921,7 @@ osu-t15-%:
 	${STAGE} -source ${OSU_T15_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-techlef sky130_osu_sc_15T.tlef rename=sky130_osu_sc_15t_ms.tlef \
 		-spice 15T_ms/cdl/*.spice compile-only exclude=*.*.spice \
-		-lef 15T_ms/lef/*.lef \
+		-lef 15T_ms/lef/*.lef noconvert \
 		-lib 15T_ms/lib/*.lib \
 		-gds 15T_ms/gds/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
@@ -1930,7 +1930,7 @@ osu-t15-%:
 	${STAGE} -source ${OSU_T15_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-techlef sky130_osu_sc_15T.tlef rename=sky130_osu_sc_15t_ls.tlef \
 		-spice 15T_ls/cdl/*.spice compile-only exclude=*.*.spice \
-		-lef 15T_ls/lef/*.lef \
+		-lef 15T_ls/lef/*.lef noconvert \
 		-lib 15T_ls/lib/*.lib \
 		-gds 15T_ls/gds/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
@@ -1941,7 +1941,7 @@ osu-t18-%:
 	${STAGE} -source ${OSU_T18_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-techlef sky130_osu_sc_18T.tlef rename=sky130_osu_sc_18t_hs.tlef \
 		-spice 18T_hs/cdl/*.spice compile-only exclude=*.*.spice \
-		-lef 18T_hs/lef/*.lef \
+		-lef 18T_hs/lef/*.lef noconvert \
 		-lib 18T_hs/lib/*.lib \
 		-gds 18T_hs/gds/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
@@ -1950,7 +1950,7 @@ osu-t18-%:
 	${STAGE} -source ${OSU_T18_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-techlef sky130_osu_sc_18T.tlef rename=sky130_osu_sc_18t_ms.tlef \
 		-spice 18T_ms/cdl/*.spice compile-only exclude=*.*.spice \
-		-lef 18T_ms/lef/*.lef \
+		-lef 18T_ms/lef/*.lef noconvert \
 		-lib 18T_ms/lib/*.lib \
 		-gds 18T_ms/gds/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \
@@ -1959,7 +1959,7 @@ osu-t18-%:
 	${STAGE} -source ${OSU_T18_PATH} -target ${STAGING_PATH}/${SKY130$*} \
 		-techlef sky130_osu_sc_18T.tlef rename=sky130_osu_sc_18t_ls.tlef \
 		-spice 18T_ls/cdl/*.spice compile-only exclude=*.*.spice \
-		-lef 18T_ls/lef/*.lef \
+		-lef 18T_ls/lef/*.lef noconvert \
 		-lib 18T_ls/lib/*.lib \
 		-gds 18T_ls/gds/*.gds compile-only \
 			options=custom/scripts/gds_import_sc.tcl \

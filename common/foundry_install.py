@@ -402,6 +402,21 @@ def get_gds_properties(magfile):
     return proplines
 
 #----------------------------------------------------------------------------
+# Return the cell's own timestamp line from a .mag file (the one in the
+# header, not the ones in "use" records), or None.
+#----------------------------------------------------------------------------
+
+def get_mag_timestamp(magfile):
+    if os.path.isfile(magfile):
+        with open(magfile, 'r') as ifile:
+            for line in ifile:
+                if line.startswith('timestamp '):
+                    return line.rstrip('\n')
+                if line.startswith('<<'):
+                    break
+    return None
+
+#----------------------------------------------------------------------------
 # Read subcircuit ports from a CDL file, given a subcircuit name that should
 # appear in the file as a subcircuit entry, and return a dictionary of ports
 # and their indexes in the subcircuit line.
@@ -644,6 +659,7 @@ if __name__ == '__main__':
     # it has the wrong version.
     have_mag_8_2 = False
     have_mag_8_3_261 = False
+    have_mag_8_3_691 = False
     try:
         mproc = subprocess.run(
             ['magic', '--version'],
@@ -664,10 +680,14 @@ if __name__ == '__main__':
                         print('Magic version 8.2 (or better) available on the system.')
                 if int(mag_version_info[0]) > 8:
                     have_mag_8_3_261 = True
+                    have_mag_8_3_691 = True
                 elif int(mag_version_info[0]) == 8:
                     if int(mag_version_info[1]) > 3:
                         have_mag_8_3_261 = True
+                        have_mag_8_3_691 = True
                     elif int(mag_version_info[1]) == 3:
+                        if int(mag_version_info[2]) >= 691:
+                            have_mag_8_3_691 = True
                         if int(mag_version_info[2]) >= 261:
                             have_mag_8_3_261 = True
             except ValueError:
@@ -1565,7 +1585,7 @@ if __name__ == '__main__':
                     print('crashbackups stop', file=ofile)
                     print('drc off', file=ofile)
                     print('locking off', file=ofile)
-                    if do_timestamp and have_mag_8_3_261:
+                    if do_timestamp and have_mag_8_3_261 and not have_mag_8_3_691:
                         print('gds datestamp ' + str(timestamp_value), file=ofile)
                     print('gds readonly true', file=ofile)
                     print('gds drccheck false', file=ofile)
@@ -1822,9 +1842,16 @@ if __name__ == '__main__':
                         cwd = destlibdir,
                     )
 
-                # Set have_lef now that LEF files were made, so they
-                # can be used to generate the maglef/ databases.
-                have_lef = True
+                # Set have_lef if LEF files were made, so they can be
+                # used to generate the maglef/ databases.  Magic does not
+                # write LEF files for every library (e.g., primitive
+                # devices), so check that some exist.
+                lefoutdir = targetdir + lef_reflib + destlib + '/lef'
+                if os.path.isdir(lefoutdir):
+                    for lefname in os.listdir(lefoutdir):
+                        if os.path.splitext(lefname)[1].lower() == '.lef':
+                            have_lef = True
+                            break
 
             elif not have_mag_8_2:
                 print('The installer is not able to run magic.')
@@ -1854,7 +1881,6 @@ if __name__ == '__main__':
         srcdir = targetdir + lef_reflib + 'lef'
         magdir = targetdir + gds_reflib + 'mag'
         cdldir = targetdir + cdl_reflib + 'cdl'
-        os.makedirs(destdir, exist_ok=True)
 
         # For each library, create the library subdirectory
         for library in libraries:
@@ -1877,6 +1903,17 @@ if __name__ == '__main__':
             clibdir = cdir
             slibdir = sdir
 
+            # Find LEF file names in the source.  Do not create the
+            # maglef/ directory for a library that has no LEF files.
+            leffiles = []
+            if os.path.isdir(srclibdir):
+                leffiles = os.listdir(srclibdir)
+                leffiles = list(item for item in leffiles if os.path.splitext(item)[1].lower() == '.lef')
+
+            if len(leffiles) == 0:
+                print('Warning:  No LEF files found in ' + srclibdir)
+                continue
+
             os.makedirs(destlibdir, exist_ok=True)
 
             # Link to the PDK magic startup file from the target directory
@@ -1890,12 +1927,6 @@ if __name__ == '__main__':
                     os.remove(destlibdir + '/.magicrc')
                 os.symlink(startup_script, destlibdir + '/.magicrc')
  
-                # Find LEF file names in the source
-                leffiles = []
-                if os.path.isdir(srclibdir):
-                    leffiles = os.listdir(srclibdir)
-                    leffiles = list(item for item in leffiles if os.path.splitext(item)[1].lower() == '.lef')
-
                 # Get list of abstract views to make from LEF macros
                 lefmacros = []
                 err_no_macros = False
@@ -1921,10 +1952,6 @@ if __name__ == '__main__':
                             if os.path.split(file)[1] in notlefnames:
                                 lefmacros.remove(file)
 
-                if len(leffiles) == 0:
-                    print('Warning:  No LEF files found in ' + srclibdir)
-                    continue
-
                 print('Generating conversion script to create magic databases from LEF')
 
                 # Generate a script called "generate_magic.tcl" and leave it in
@@ -1949,10 +1976,6 @@ if __name__ == '__main__':
 
                         tcldevlist = '{' + ' '.join(shortdevlist) + '}'
                         print('set devlist ' + tcldevlist, file=ofile)
-
-                    # Force the abstract view timestamps to match the full views
-                    if do_timestamp and have_mag_8_3_261:
-                        print('lef datestamp ' + str(timestamp_value), file=ofile)
 
                     for leffile in leffiles:
                         print('lef read ' + srclibdir + '/' + leffile, file=ofile)
@@ -2031,6 +2054,7 @@ if __name__ == '__main__':
                     magfile = maglibdir + '/' + magroot
                     magleffile = destlibdir + '/' + magroot
                     prop_lines = get_gds_properties(magfile)
+                    mag_timestamp = get_mag_timestamp(magfile) if prop_lines else None
 
                     # Make sure properties include the Tcl generated cell
                     # information from the PDK script
@@ -2086,6 +2110,9 @@ if __name__ == '__main__':
                         has_props = False
                         is_gencell = False
                         for line in magtext:
+                            if mag_timestamp and line.startswith('timestamp '):
+                                line = mag_timestamp
+                                mag_timestamp = None
                             tmatch = portrex.match(line)
                             if tmatch:
                                 if portnum >= 0:
