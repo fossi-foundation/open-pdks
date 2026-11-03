@@ -2769,7 +2769,6 @@ style  import
 
 #ifdef METALS5 || METALS6
  layer rm5 MET5
- and RESDEF
  and MET5RES
 
 #ifdef METALS5 && MIM
