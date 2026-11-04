@@ -1,0 +1,1717 @@
+###
+###	Source file sky130-cifout.tech
+###	Process this file with the preproc.py macro processor
+###
+#----------------------------------------------------------
+# TECHNAME technology file:  cifoutput section
+# Included by TECHNAME.tech
+#----------------------------------------------------------
+cifoutput
+
+#----------------------------------------------------------------
+style gdsii variants (),(origfill)
+# NOTE: This section is used for actual GDS output
+#----------------------------------------------------------------
+ scalefactor 10  nanometers
+ options calma-permissive-labels
+ gridlimit 5
+
+#----------------------------------------------------------------
+# Create a temp layer from the cell bounding box for use in
+# generating ID layers.  Note that "boundary", unlike "bbox",
+# requires the FIXED_BBOX property (abutment box) in the cell.
+#----------------------------------------------------------------
+ templayer CELLBOUND
+	boundary
+
+#----------------------------------------------------------------
+# BOUND
+#----------------------------------------------------------------
+ layer 	BOUND CELLBOUND
+	calma 235 4
+
+#----------------------------------------------------------------
+# DNWELL
+#----------------------------------------------------------------
+
+ layer DNWELL	dnwell,npn,photo
+	calma	64 18
+
+ layer PWRES    rpw
+	and	dnwell
+	calma	64 13
+
+#----------------------------------------------------------------
+# SUBCUT
+#----------------------------------------------------------------
+
+ layer SUBCUT	isosub
+	calma	81 53
+
+#----------------------------------------------------------------
+# NWELL
+#----------------------------------------------------------------
+
+ # Identify LDMOS drain areas
+ templayer ndrainarea
+	bloat-all ed *mvnsd
+	and-not ed
+
+ templayer pdrainarea
+	bloat-all ed *mvpsd
+	and-not ed
+
+ # Generate n-well under extended-drain nFET
+ templayer extnwell
+	bloat-or *mvnsd * 0 extdrain 1150
+	and-not *mvnsd
+	or ndrainarea
+	grow 660
+
+ # Erase n-well under extended-drain pFET
+ templayer extpwell
+	bloat-or *mvpsd * 0 extdrain 590
+	and-not *mvpsd
+	or pdrainarea
+	grow 860
+
+ layer NWELL 	allnwell
+	bloat-all rpw dnwell
+	and-not rpw,pwell
+	or extnwell
+	and-not extpwell
+ 	calma 	64 20
+
+ layer WELLTXT
+ 	labels allnwell
+	calma 64 5
+
+ layer WELLPIN
+ 	labels allnwell port
+	calma 64 16
+
+#----------------------------------------------------------------
+# SUB (text/port only)
+#----------------------------------------------------------------
+
+ layer SUBTXT
+ 	labels pwell
+	calma 64 59
+
+ layer SUBPIN
+ 	labels pwell port
+	calma 122 16
+
+#----------------------------------------------------------------
+# DIFF
+#----------------------------------------------------------------
+
+ # Extended-drain FETs cut the diffusion under the gate
+ templayer ldbreak
+	bloat-or *mvnsd * 0 extdrain 1585
+	bloat-or *mvpsd * 0 extdrain 1190
+
+ layer DIFF 	allnactivenontap,allpactivenontap,allactiveres
+	and-not	ldbreak
+ 	calma 	65 20
+
+ layer DIFFTXT
+ 	labels allnactivenontap,allpactivenontap
+	calma	65 6
+
+ layer DIFFPIN
+ 	labels allnactivenontap,allpactivenontap port
+	calma	65 16
+
+#----------------------------------------------------------------
+# TAP
+#----------------------------------------------------------------
+
+ layer TAP 	allnactivetap,allpactivetap
+ 	labels 	allnactivetap,allpactivetap port
+	calma	65 44
+
+ layer TAPTXT
+ 	labels 	allnactivetap,allpactivetap
+ 	calma 	65 5
+
+#----------------------------------------------------------------
+# FOM
+#----------------------------------------------------------------
+
+ layer FOMFILL	fomfill
+	labels	fomfill
+	calma	23 28
+
+#----------------------------------------------------------------
+# PSDM, NSDM (PPLUS, NPLUS implants)
+#----------------------------------------------------------------
+
+ templayer basePSDM pdiffres,mvpdiffres
+	grow	15
+	or	xhrpoly,uhrpoly,xpc
+	grow	110
+	bloat-or allpactivetap * 125 allnactivenontap 0
+	bloat-or allpactivenontap * 125 allnactivetap 0
+
+ templayer baseNSDM ndiffres,mvndiffres
+ 	grow	125
+	bloat-or allnactivetap * 125 allpactivenontap 0
+	bloat-or allnactivenontap * 125 allpactivetap 0
+
+ templayer extendPSDM  basePSDM
+	bridge	380 380
+	and-not baseNSDM
+
+ layer PSDM basePSDM,extendPSDM 
+	grow	185
+	shrink	185
+	close   265000
+	mask-hints PSDM
+	calma	94 20
+
+ templayer extendNSDM  baseNSDM
+	bridge	380 380
+	and-not basePSDM
+
+ layer NSDM baseNSDM,extendNSDM
+	grow	185
+	shrink	185
+ 	close   265000
+	mask-hints NSDM
+ 	calma	93 44
+
+#----------------------------------------------------------------
+# EDID (Extended drain identifier)
+#----------------------------------------------------------------
+
+ layer EDID
+	bloat-all extdrain *mvnsd,*mvpsd,mvnfet,mvpfet,*mvndiff,*mvpdiff
+	labels	extdrain
+	calma	81 57
+
+#----------------------------------------------------------------
+# LVID
+#----------------------------------------------------------------
+
+ layer LVID  nnfet
+        grow 100
+	calma 81 60
+
+#----------------------------------------------------------------
+# LVTN
+#----------------------------------------------------------------
+
+ layer LVTN  pfetlvt,nfetlvt,scnfetlvt,mvvar,mvnnfet,nnfet,nsonos,*pdiodelvt,*ndiodelvt,*nndiode
+        grow 180
+	bridge	380 380
+	grow	185
+	shrink	185
+	close  265000
+	mask-hints LVTN
+	calma 125 44
+
+#----------------------------------------------------------------
+# HVTR
+#----------------------------------------------------------------
+
+ layer HVTR  pfetmvt
+        grow 180
+	bridge	380 380
+	grow	185
+	shrink	185
+	close  265000
+	calma 18 20
+
+#----------------------------------------------------------------
+# HVTP
+#----------------------------------------------------------------
+
+ layer HVTP scpfethvt,ppu,pfethvt,varhvt,*pdiodehvt
+        grow 180
+	bridge	380 380
+	grow	185
+	shrink	185
+	close 265000
+	mask-hints HVTP
+	calma 78 44
+
+#----------------------------------------------------------------
+# SONOS
+#----------------------------------------------------------------
+
+ layer SONOS nsonos
+	grow 100
+	grow-min 410
+	bridge 500 410
+	grow 250
+	shrink 250
+	calma 80 20
+
+#----------------------------------------------------------------
+# The coreli layer indicates a cell needing COREID.  Also,
+# devices npd, npass, and ppu indicate a COREID cell.  NOTE:
+# SONOS does not use COREID, counter to SkyWater rules.
+#----------------------------------------------------------------
+
+ layer COREID
+	bloat-all coreli,ppu,npd,npass,corepvar,corenvar CELLBOUND
+	mask-hints COREID
+	calma 81 2
+
+#----------------------------------------------------------------
+# STDCELL applies to all cells containing scnfet or scpfet.
+#----------------------------------------------------------------
+
+ layer STDCELL scnfet
+	bloat-all scpfet,scpfethvt,scnfet,scnfetlvt CELLBOUND
+	mask-hints STDCELL
+	calma 81 4
+
+#----------------------------------------------------------------
+# ESDID is a marker layer for ESD devices in the padframe I/O.
+#----------------------------------------------------------------
+
+ layer ESDID  
+	bloat-all mvnfetesd *mvndiff,*poly
+	bloat-all mvpfetesd *mvpdiff,*poly
+	grow 100
+	mask-hints ESDID
+	calma 81 19
+
+#----------------------------------------------------------------
+# NPNID and PNPID apply to bipolar transistors
+#----------------------------------------------------------------
+
+ layer NPNID
+	bloat-all npn dnwell
+	mask-hints NPNID
+	calma	82 20
+
+ templayer pnparea pnp
+	grow 400
+
+ layer PNPID
+	bloat-all pnparea *psd
+	or pnparea
+	mask-hints PNPID
+	calma	82 44
+
+ layer PHOTO photo
+	calma	81 81
+
+#----------------------------------------------------------------
+# RPM
+#----------------------------------------------------------------
+
+ layer RPM
+	bloat-all xhrpoly xpc
+	grow 620
+	shrink 420
+	mask-hints RPM
+	calma 86 20
+
+#----------------------------------------------------------------
+# URPM (2kOhms/sq. poly implant)
+#----------------------------------------------------------------
+
+ layer URPM
+	bloat-all uhrpoly xpc
+	grow 620
+	shrink 420
+	mask-hints URPM
+	calma 79 20
+
+#----------------------------------------------------------------
+# LDNTM (Tip implant for SONOS FETs)
+#----------------------------------------------------------------
+
+ layer LDNTM
+	bloat-all nsonos *ndiff
+	grow 185
+ 	grow 	345
+ 	shrink 	345
+	mask-hints LDNTM
+	calma 11 44
+
+#----------------------------------------------------------------
+# HVNTM (Tip implant for MV ndiff devices)
+#----------------------------------------------------------------
+
+ templayer hvntm_block *mvpsd
+	grow 185
+
+ layer HVNTM
+	bloat-all mvnfet,mvnfetesd,mvnnfet,nnfet,*mvndiode,mvrdn,*nndiode *mvndiff
+	bloat-all mvvaractor *mvnsd
+	and-not hvntm_block
+        grow 185
+	bridge 700 700
+ 	grow 	345
+ 	shrink 	345
+	and-not hvntm_block
+	mask-hints HVNTM
+	calma 125 20
+
+#----------------------------------------------------------------
+# POLY
+#----------------------------------------------------------------
+
+ layer POLY 	allpoly
+ 	calma 	66 20
+
+ layer POLYTXT
+	labels  allpoly
+	calma	66 5
+
+ layer POLYPIN
+	labels  allpoly port
+	calma	66 16
+
+ layer POLYFILL	polyfill
+	labels 	polyfill
+	calma	28 28
+
+#----------------------------------------------------------------
+# HVI (includes rules NWELL 8-11 and DIFFTAP 14-26)
+#----------------------------------------------------------------
+
+ templayer thkox_area ed
+	grow 475
+	or alldiffmv,mvvar
+	grow	185
+	bloat-all alldiffmv nwell
+	grow 345
+	shrink 345
+
+ templayer large_ptap_mv thkox_area
+	shrink	420
+	grow	420
+
+ templayer small_ptap_mv thkox_area
+	and-not large_ptap_mv
+	# (HVI min width rule is 0.6 but CNTM min width rule is 0.84um)
+	grow-min 840
+
+ layer HVI 	thkox_area,small_ptap_mv
+	bridge	700 600
+ 	grow 	345
+ 	shrink 	345
+	mask-hints HVI
+ 	calma 	75 20
+
+#----------------------------------------------------------------
+# CONT (LICON)
+#----------------------------------------------------------------
+
+ layer CONT allcont
+ 	squares-grid 0 170 170
+ 	calma	66 44
+
+ # Contact for pres is different than other LICON contacts
+ # See rules LICON 1b, 1c (width/length) and 2b (spacing)
+ templayer xpc_horiz xpc
+	shrink 1007
+	grow 1007
+
+ layer CONT xpc
+	and-not xpc_horiz
+	# Force long edge vertical for contacts narrower than 2um
+	# Minimum space is 350 but 520 satisfies no. of contacts rule
+ 	slots 80 190 520 80 2000 350
+ 	calma	66 44
+
+ layer CONT xpc
+	and xpc_horiz
+	# Force long edge vertical for contacts wider than 2um
+	# Minimum space is 350 but 520 satisfies no. of contacts rule
+ 	slots 80 2000 350 80 190 520
+ 	calma	66 44
+
+#----------------------------------------------------------------
+# NPC (Nitride poly cut)
+# surrounds CONT (LICON) on poly only (i.e., pc)
+#----------------------------------------------------------------
+
+ # Avoids a common case of NPC bridges too close to other LICON shapes.
+ templayer diffcutarea pdc,ndc,psc,nsc,mvpdc,mvndc,mvpsc,mvnsc
+	grow 90
+
+ layer NPC pc
+ 	squares-grid 0 170 170
+	grow 100
+	bridge 270 270
+	and-not diffcutarea
+	bridge 270 270
+	grow 130
+	shrink 130
+	mask-hints NPC
+	calma  95 20
+
+ # NPC is also generated on xhrpoly and uhrpoly resistors
+
+ layer NPC xpc,xhrpoly,uhrpoly
+        # xpc surrounds precision_resistor by 0.095um
+	grow 95
+	grow 130
+	shrink 130
+	calma  95 20
+
+#----------------------------------------------------------------
+# Device markers
+#----------------------------------------------------------------
+
+ layer DIFFRES rdn,mvrdn,rdp,mvrdp
+	calma 65 13
+
+ layer POLYRES mrp1
+	calma 66 13
+
+ # POLYSHORT is a poly layer resistor like rli, rm1, etc., for metal layers
+ layer POLYSHORT rmp
+	calma 66 15
+
+ # POLYRES extends to edge of contact cut
+ layer POLYRES xhrpoly,uhrpoly
+	grow 80
+	and xpc
+	or xhrpoly,uhrpoly
+	calma 66 13
+
+ layer DIODE *pdi,*ndi,*nndi,*mvpdi,*mvndi,*pdilvt,*pdihvt,*ndilvt
+        # To be done:  Expand to include anode, cathode, and guard ring
+	calma 81 23
+
+#----------------------------------------------------------------
+# LI
+#----------------------------------------------------------------
+ layer LI allli
+	calma 67 20
+
+ layer LITXT
+ 	labels *locali,coreli
+	calma 67 5
+
+ layer LIPIN
+ 	labels *locali,coreli port
+	calma 67 16
+
+ layer LIRES rli
+	labels rli
+	calma 67 13
+
+ layer LIFILL	lifill
+	labels 	lifill
+	calma	56 28
+
+#----------------------------------------------------------------
+# MCON
+#----------------------------------------------------------------
+ layer MCON mcon
+ 	squares-grid 0 170 190
+ 	calma 	67 44
+
+#----------------------------------------------------------------
+# MET1
+#----------------------------------------------------------------
+ layer MET1 	allm1
+ 	calma 	68 20
+
+ layer MET1TXT
+	labels	allm1
+	calma 	68 5
+
+ layer MET1PIN
+	labels	allm1 port
+	calma 	68 16
+
+ layer MET1RES rm1
+	labels rm1
+	calma 68 13
+
+ layer MET1FILL m1fill
+	labels m1fill
+	calma 36 28
+
+#----------------------------------------------------------------
+# VIA1
+#----------------------------------------------------------------
+ layer VIA1 	via1
+ 	squares-grid 55 150 170
+ 	calma 	68 44
+
+#ifdef RERAM
+#undef RERAM
+ layer VIA1 	reram
+ 	squares-grid 55 150 170
+ 	calma 	68 44
+
+ layer RERAM	reram
+	calma	201 20
+#define RERAM
+#endif (RERAM)
+
+#----------------------------------------------------------------
+# MET2
+#----------------------------------------------------------------
+ layer MET2 	allm2
+ 	calma 	69 20
+
+ layer MET2TXT
+	labels	allm2
+	calma	69 5
+
+ layer MET2PIN
+	labels	allm2 port
+	calma	69 16
+
+ layer MET2RES rm2
+	labels rm2
+	calma 69 13
+
+ layer MET2FILL m2fill
+	labels m2fill
+	calma 41 28
+
+#----------------------------------------------------------------
+# VIA2
+#----------------------------------------------------------------
+ layer VIA2 	via2
+ 	squares-grid 40 200 200
+ 	calma 	69 44
+
+#----------------------------------------------------------------
+# MET3
+#----------------------------------------------------------------
+ layer MET3 	allm3
+ 	calma 	70 20
+
+ layer MET3TXT
+ 	labels 	allm3
+	calma	70 5
+
+ layer MET3PIN
+	labels	allm3 port
+	calma	70 16 
+
+ layer MET3RES rm3
+	labels rm3
+	calma 70 13
+
+ layer MET3FILL m3fill
+	labels m3fill
+	calma 34 28
+
+#ifdef METAL5
+#----------------------------------------------------------------
+# VIA3
+#----------------------------------------------------------------
+ layer VIA3	via3
+#ifdef MIM
+	or mimcc
+#endif (MIM)
+ 	squares-grid 60 200 200
+ 	calma 	70 44
+
+#----------------------------------------------------------------
+# MET4
+#----------------------------------------------------------------
+ layer MET4 	allm4
+ 	calma 	71 20
+
+ layer MET4TXT
+	labels	allm4
+	calma	71 5
+
+ layer MET4PIN
+	labels	allm4 port
+	calma	71 16
+
+ layer MET4RES rm4
+	labels rm4
+	calma 71 13
+
+ layer MET4FILL m4fill
+	labels m4fill
+	calma 51 28
+
+#----------------------------------------------------------------
+# VIA4
+#----------------------------------------------------------------
+ layer VIA4	via4
+#ifdef MIM
+	or mim2cc
+#endif (MIM)
+ 	squares-grid 190 800 800
+ 	calma 	71 44
+
+#----------------------------------------------------------------
+# MET5
+#----------------------------------------------------------------
+ layer MET5 	allm5,m5fill
+ 	calma 	72 20
+
+ layer MET5TXT
+	labels	allm5
+	calma	72 5
+
+ layer MET5PIN
+	labels	allm5 port
+	calma	72 16
+
+ layer MET5RES rm5
+	labels rm5
+	calma 72 13
+
+ layer MET5FILL m5fill
+	labels m5fill
+	calma 59 28
+
+#endif (METAL5)
+
+#ifdef REDISTRIBUTION
+#----------------------------------------------------------------
+# RDL
+#----------------------------------------------------------------
+  layer RDL	*metrdl
+	calma   74 20
+
+  layer RDLTXT
+	labels	*metrdl
+	calma	74 5
+
+  layer RDLPIN
+	labels  *metrdl port
+	calma	74 16
+
+  layer PI1	*metrdl
+	and	m5,glass
+	# Test only---needs GDS layer number
+
+  layer	UBM	*metrdl
+	shrink	50000
+	grow	40000
+	# Test only---needs GDS layer number
+	
+  layer	PI2	*metrdl
+	shrink	50000
+	grow	25000
+	# Test only---needs GDS layer number
+
+#endif REDISTRIBUTION
+
+#----------------------------------------------------------------
+# GLASS
+#----------------------------------------------------------------
+ layer GLASS 	glass
+ 	calma 	76 20
+
+#ifdef MIM
+#----------------------------------------------------------------
+# CAPM
+#----------------------------------------------------------------
+ layer CAPM 	*mimcap
+ 	labels 	mimcap
+ 	calma 	89 44
+
+ layer CAPM2 	*mimcap2
+ 	labels 	mimcap2
+ 	calma 	97 44
+#endif (MIM)
+
+#----------------------------------------------------------------
+# Chip top level marker for DRC latchup rules to check 15um
+# distance to taps (otherwise 6um is used)
+#----------------------------------------------------------------
+
+ layer LOWTAPDENSITY
+	bbox top
+	# Clear 200um for pads + 50um for required high tap density
+	# in critical area.
+	shrink 250000
+	calma	81 14
+
+#----------------------------------------------------------------
+# FILLBLOCK
+#----------------------------------------------------------------
+ variants (origfill)
+
+ layer FILLOBSFOM  obsactive
+	calma	22 24
+
+ layer FILLOBSLI fillblock,obsli
+	calma	67 10
+
+ layer FILLOBSM1 fillblock,obsm1
+ 	calma 	62 24
+
+ layer FILLOBSM2 fillblock,obsm2
+ 	calma 	105 52
+
+ layer FILLOBSM3 fillblock,obsm3
+ 	calma 	107 24
+
+#ifdef METAL5
+ layer FILLOBSM4 fillblock,obsm4
+ 	calma 	112 4
+
+ layer FILLOBSM5 fillblock,obsm5
+	calma	117 4
+#endif
+
+ variants ()
+
+ layer FILLOBSFOM  obsactive
+	calma	65 98
+
+ # NOTE: should there be an "obspoly" layer?
+
+ layer FILLOBSLI fillblock,obsli
+	calma	67 98
+
+ layer FILLOBSM1 fillblock,obsm1
+ 	calma 	68 98
+
+ layer FILLOBSM2 fillblock,obsm2
+ 	calma 	69 98
+
+ layer FILLOBSM3 fillblock,obsm3
+ 	calma 	70 98
+
+#ifdef METAL5
+ layer FILLOBSM4 fillblock,obsm4
+ 	calma 	71 98
+
+ layer FILLOBSM5 fillblock,obsm5
+	calma	72 98
+#endif
+
+ variants *
+
+ render	DNWELL 	cwell       -0.1    0.1
+ render	NWELL	nwell        0.0    0.2062
+ render DIFF	ndiffusion   0.2062 0.12
+ render TAP	pdiffusion   0.2062 0.12
+ render POLY	polysilicon  0.3262 0.18
+ render CONT	via          0.5062 0.43
+ render LI	metal1       0.9361 0.10
+ render MCON	via          1.0361 0.34
+ render MET1	metal2       1.3761 0.36
+ render VIA1	via          1.7361 0.27
+ render MET2	metal3       2.0061 0.36
+ render VIA2	via          2.3661 0.42
+ render MET3	metal4       2.7861 0.845
+#ifdef METAL5
+ render VIA3	via          3.6311 0.39
+ render MET4	metal5       4.0211 0.845
+ render VIA4	via          4.8661 0.505
+ render MET5	metal6       5.3711 1.26
+ render CAPM	metal8       2.4661 0.2
+ render CAPM2	metal9       3.7311 0.2
+#ifdef REDISTRIBUTION
+ render RDL	metal7      11.8834 4.0
+#endif (!REDISTRIBUTION)
+#endif (!METAL5)
+
+#----------------------------------------------------------------
+style drc
+#----------------------------------------------------------------
+# NOTE:  This style is used for DRC only, not for GDS output
+#----------------------------------------------------------------
+ scalefactor 10  nanometers
+ options calma-permissive-labels
+
+ # Ensure nwell overlaps dnwell at least 0.4um outside and 1.03um inside
+ templayer dnwell_shrink dnwell
+ shrink 1030
+
+ templayer nwell_missing dnwell
+ grow 400
+ and-not dnwell_shrink
+ and-not nwell
+
+ templayer pwell_in_dnwell dnwell
+ and-not nwell
+
+ # SONOS nFET devices must be in deep nwell
+ templayer dnwell_missing nsonos
+ and-not dnwell
+
+ # SONOS nFET devices must be in cell with abutment box
+ templayer abutment_box
+	boundary
+
+ templayer bbox_missing nsonos
+	and-not abutment_box
+
+ # Make sure nwell covers varactor poly
+ templayer var_poly_no_nwell
+	bloat-all varactor,mvvaractor *poly
+	grow 150
+	and-not nwell
+
+ # Define areas where mim2cc is inside the boundary of mimcc
+ # by more than the contact surround
+ templayer mim2_contact_overlap
+ bloat-all *mimcap2 mimcc
+ shrink 60
+ and-not *mimcap2
+
+ # Note that metal fill is performed by the foundry and so is not
+ # an option for a cifoutput style.
+
+ # Check latchup rule (15um minimum from tap LICON center to any
+ # non-tap diffusion.  Note that to count as a tap, the diffusion
+ # must be contacted to LI
+
+ templayer ptap_reach psc,mvpsc
+ and-not dnwell
+ # grow total is 15um.  grow in 0.84um increments to ensure that
+ # no nwell ring is crossed
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 840
+ and-not nwell,dnwell
+ grow 635
+ and-not nwell,dnwell
+
+ templayer ptap_missing *ndiff,*mvndiff
+ and-not dnwell
+ and-not ptap_reach
+
+ templayer ntap_reach nsc,mvnsc
+ # grow total is 15um.  grow in 1.27um increments to ensure that
+ # no nwell ring is crossed.  There is no difference between
+ # ntaps in and out of deep nwell.
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 1270
+ and nwell,pnp
+ grow 945
+ and nwell,pnp
+ 
+ templayer ntap_missing *pdiff,*mvpdiff
+ and-not pwell_in_dnwell
+ and-not ntap_reach
+
+ templayer dptap_reach psc,mvpsc
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 840
+ and-not nwell
+ and dnwell
+ grow 635
+ and-not nwell
+ and dnwell
+
+ templayer dptap_missing *ndiff,*mvndiff
+ and dnwell
+ and-not dptap_reach
+
+ templayer pdiff_crosses_dnwell dnwell
+ grow 20
+ and-not dnwell
+ and allpdifflv,allpdiffmv
+
+ # MV nwell must be 2um from any other nwell
+ templayer mvnwell_simple
+ bloat-all alldiffmv nwell
+
+ templayer mvnwell mvnwell_simple
+ grow-min 840
+ bridge	700 600
+
+ # Diffusion spacing to mvnwell.  Note:  mvdiff to any well
+ # (mv or lv) is the same rule and can be checked by regular
+ # edge-based rules.  Only mvwell to lvdiff needs a CIF rule.
+ templayer difftap_near_mvnwell mvnwell_simple
+ grow 430
+ and alldifflv,*mvpsd
+
+ # Simple spacing checks to lvnwell must use CIF-DRC rule
+ # Note that HVI may *abut* lvnwell;  this can only be handled
+ # with mask-hints layers.
+
+ templayer drawn_hvi
+ mask-hints HVI
+
+ templayer allmvdiffnowell *mvndiff,*mvpsd
+ and-not drawn_hvi
+
+ templayer lvnwell nwell
+ and-not mvnwell
+
+ templayer hvi_abut_lvnwell lvnwell
+ grow 5
+ and drawn_hvi
+ grow 695
+
+ templayer hvi_to_lvnwell drawn_hvi
+ and-not hvi_abut_lvnwell
+ grow 700
+ and lvnwell
+
+ # Check for low-voltage diffusion in high-voltage well
+ templayer lvdiff_in_mvnwell *pdiff,*pdiode,pdiffres,*nsd
+ or pfet,ppu,scpfet,scpfethvt,pfetlvt,pfetmvt,pfethvt
+ and mvnwell
+
+ templayer nwell_with_tap
+ bloat-all nsc,mvnsc nwell,pnp
+
+ templayer nwell_missing_tap nwell,pnp
+ and-not nwell_with_tap
+
+ templayer tap_with_licon
+ bloat-all allpactivetap psd,mvpsd
+ bloat-all allnactivetap nsd,mvnsd
+
+ templayer tap_missing_licon allnactivetap,allpactivetap
+ and-not tap_with_licon
+
+ # Make sure varactor nwell contains no P diffusion
+ templayer pdiff_in_varactor_well
+ bloat-all varactor,mvvaractor nwell
+ and allpactive
+
+ # HVNTM spacing requires recreating HVNTM
+ templayer hvntm_block *mvpsd
+ grow 185
+
+ templayer hvntm_generate
+ bloat-all mvnfet,mvnfetesd,mvnnfet,nnfet,*mvndiode,mvrdn,*nndiode *mvndiff
+ bloat-all mvvaractor *mvnsd
+ and-not hvntm_block
+ grow 185
+ bridge 700 700
+ grow    345
+ shrink  345
+ and-not hvntm_block
+
+ # Generate RPM for DRC checks
+ templayer rpm_generate
+ bloat-all xhrpoly,uhrpoly xpc
+ grow 620
+ shrink 420
+ mask-hints RPM
+ mask-hints URPM
+
+ # Check distance RPM to NSDM
+ templayer rpm_nsd_check rpm_generate
+ grow 325
+ and allndifflv,allndiffmv
+
+ # Check distance RPM to (unrelated) POLY
+ templayer rpm_poly_check rpm_generate
+ grow 200
+ and-not xhrpoly,uhrpoly,xpc
+ and allpoly
+
+ # Check distance RPM to HVNTM
+ templayer rpm_hvntm_check rpm_generate
+ grow 385
+ and allndiffmvnontap
+
+ templayer m1_small_hole allm1,obsm1,obsmcon
+ close   140000
+
+ templayer m1_hole_empty m1_small_hole
+ and-not allm1,obsm1,obsmcon
+
+ templayer m2_small_hole allm2,obsm2
+ close   140000
+
+ templayer m2_hole_empty m2_small_hole
+ and-not allm2,obsm2
+
+ templayer m1_huge allm1
+ shrink 1500
+ grow 1500
+
+ templayer m1_large_halo m1_huge
+ grow 280
+ and-not m1_huge
+ and allm1
+
+ templayer m2_huge allm2
+ shrink 1500
+ grow 1500
+
+ templayer m2_large_halo m2_huge
+ grow 280
+ and-not m2_huge
+ and allm2
+
+ templayer m3_huge allm3
+ shrink 1500
+ grow 1500
+
+ templayer m3_large_halo m3_huge
+ grow 400
+ and-not m3_huge
+ and allm3
+
+ templayer m4_huge allm4
+ shrink 1500
+ grow 1500
+
+ templayer m4_large_halo m4_huge
+ grow 400
+ and-not m4_huge
+ and allm4
+
+#ifdef EXPERIMENTAL
+#----------------------------------------------------------------
+style paint
+#----------------------------------------------------------------
+# NOTE:  This style is used for database manipulations only via
+# the "cif paint" command.
+#----------------------------------------------------------------
+
+ scalefactor 10  nanometers
+
+ templayer m1grow *m1
+    grow 290
+
+ # layer listrap:  Use the following set of commands to strap local
+ # interconnect wires with metal1 (inside the cursor box) to satisfy
+ # the maximum aspect ratio rule for local interconnect:
+ #
+ #    tech unlock *
+ #    cif ostyle paint
+ #    cif paint m1strap comment
+ #    cif paint m1strap m1
+ #    cif paint listrap viali
+ #    erase comment
+
+ templayer m1strap *li
+    and-not m1grow
+    grow 30
+
+ templayer listrap comment
+    slots 30 170 170 60
+
+#endif (EXPERIMENTAL)
+
+#----------------------------------------------------------------
+style density
+#----------------------------------------------------------------
+# Style used by scripts to check for fill density
+#----------------------------------------------------------------
+ scalefactor 10  nanometers
+ options calma-permissive-labels
+ gridlimit 5
+
+ templayer fom_all alldiff,fomfill
+
+ templayer poly_all allpoly,polyfill
+
+ templayer li_all allli,lifill
+
+ templayer m1_all allm1,m1fill
+
+ templayer m2_all allm2,m2fill
+
+ templayer m3_all allm3,m3fill
+
+ templayer m4_all allm4,m4fill
+
+ templayer m5_all allm5,m5fill
+
+#----------------------------------------------------------------
+style wafflefill variants (),(tiled)
+#----------------------------------------------------------------
+# Style used by scripts for automatically generating fill layers
+# NOTE: Be sure to generate output on flattened layout.
+# Also note:  This fill generator script uses the older GDS
+# layer assignments for fill layers.  The generator script that
+# uses the sky130gds.tech (e.g., sky130A-GDS.tech) technology file
+# is preferred.
+#----------------------------------------------------------------
+ scalefactor 10  nanometers
+ options calma-permissive-labels
+ gridlimit 5
+
+#----------------------------------------------------------------
+# Generate and retain a layer representing the bounding box.
+#
+# For variant ():
+# The bounding box is the full extent of geometry on the top level
+# cell.
+#
+# For variant (tiled):
+# Use with a script that breaks layout into flattened tiles and runs
+# fill individually on each.  The tiles should be larger than the
+# step size, and each should draw a layer "comment" the size of the
+# step box.
+#----------------------------------------------------------------
+
+ variants ()
+     templayer	topbox
+	 bbox	top
+
+ variants (tiled)
+     templayer	topbox comment
+	 # Each tile imposes the full keepout distance rule of
+	 # 3um on all sides.
+	 shrink 1500
+
+ variants *
+
+#----------------------------------------------------------------
+# Generate guard-band around nwells to keep FOM from crossing
+# Spacing from LV nwell = Diff/Tap 9 = 0.34um
+# Spacing from HV nwell = Diff/Tap 18 = 0.43um (= 0.18 + 0.25)
+# Enclosure by nwell = Diff/Tap 8 = 0.18um
+#----------------------------------------------------------------
+
+ templayer mvnwell
+ 	bloat-all alldiffmv nwell
+
+ templayer lvnwell allnwell
+	and-not mvnwell
+
+ templayer	well_shrink mvnwell
+	shrink 	250
+	or lvnwell
+	shrink	180
+ templayer	well_guardband allnwell
+	grow	340
+	and-not	well_shrink
+
+#---------------------------------------------------
+# Diffusion and poly keep-out areas
+#---------------------------------------------------
+ templayer      obstruct_fom alldiff,allpoly,fomfill,polyfill,obsactive
+	or	rpw,pnp,npn
+        grow    500
+	or	well_guardband
+
+ templayer      obstruct_poly alldiff,allpoly,fomfill,polyfill,obsactive
+	or	rpw,pnp,npn
+	grow	1000
+
+#---------------------------------------------------
+# FOM and POLY fill
+#---------------------------------------------------
+ templayer	fomfill_pass1 topbox
+        # slots   0 4080 1320 0 4080 1320 1360 0
+        slots   0 4080 1600 0 4080 1600 1360 0
+        and-not obstruct_fom
+	and	topbox
+        shrink  2035
+        grow    2035
+
+#---------------------------------------------------
+
+ templayer      obstruct_poly_pass1 fomfill_pass1
+        grow    300
+	or	obstruct_poly
+ templayer	polyfill_pass1 topbox
+        slots   0 720 360 0 720 360 240 0
+        and-not obstruct_poly_pass1
+	and	topbox
+        shrink  355
+        grow    355
+
+#---------------------------------------------------
+
+ templayer      obstruct_fom_pass2 fomfill_pass1
+        grow    1290
+	or	polyfill_pass1
+        grow    300
+	or	obstruct_fom
+ templayer	fomfill_pass2 topbox
+        slots   0 2500 1320 0 2500 1320 1360 0
+        and-not obstruct_fom_pass2
+	and	topbox
+        shrink  1245
+        grow    1245
+
+#---------------------------------------------------
+
+ templayer      obstruct_poly_coarse polyfill_pass1
+	grow	60
+	or	fomfill_pass1,fomfill_pass2
+	grow	300
+	or	obstruct_poly
+ templayer	polyfill_coarse topbox
+        slots   0 720 360 0 720 360 240 120
+        and-not obstruct_poly_coarse
+	and	topbox
+        shrink  355
+        grow    355
+
+#---------------------------------------------------
+ templayer      obstruct_poly_medium polyfill_pass1,polyfill_coarse
+	grow	60
+	or	fomfill_pass1,fomfill_pass2
+        grow    300
+	or	obstruct_poly
+ templayer	polyfill_medium topbox
+        slots   0 540 360 0 540 360 240 100
+        and-not obstruct_poly_medium
+	and	topbox
+        shrink  265
+        grow    265
+
+#---------------------------------------------------
+ templayer      obstruct_poly_fine polyfill_pass1,polyfill_coarse,polyfill_medium
+	grow	60
+	or	fomfill_pass1,fomfill_pass2
+	grow	300
+	or	obstruct_poly
+ templayer	polyfill_fine topbox
+        slots   0 480 360 0 480 360 240 200
+        and-not obstruct_poly_fine
+	and	topbox
+        shrink  235
+        grow    235
+
+#---------------------------------------------------
+
+ templayer      obstruct_fom_coarse fomfill_pass1,fomfill_pass2
+        grow    1290
+	or	polyfill_pass1,polyfill_coarse,polyfill_medium,polyfill_fine
+	grow	300
+	or	obstruct_fom
+ templayer	fomfill_coarse topbox
+        slots   0 1500 1320 0 1500 1320 1360 0
+        and-not obstruct_fom_coarse
+	and	topbox
+        shrink  745
+        grow    745
+
+#---------------------------------------------------
+
+ templayer      obstruct_fom_fine fomfill_pass1,fomfill_pass2,fomfill_coarse
+        grow    1290
+	or	polyfill_pass1,polyfill_coarse,polyfill_medium,polyfill_fine
+	grow	300
+	or	obstruct_fom
+ templayer	fomfill_fine topbox
+        slots   0 500 400 0 500 400 160 0
+        and-not obstruct_fom_fine
+	and	topbox
+        shrink  245
+        grow    245
+
+#---------------------------------------------------
+ layer  FOMFILL fomfill_pass1 
+	or	fomfill_pass2
+	or	fomfill_coarse
+	or	fomfill_fine
+ 	calma 	23 28
+
+ layer	POLYFILL polyfill_pass1 
+	or	 polyfill_coarse
+	or	 polyfill_medium
+	or	 polyfill_fine
+ 	calma 	28 28
+
+#---------------------------------------------------------
+# LI fill
+# Note requirement that LI fill may not overlap (non-fill)
+# diff or poly.
+#
+# Important note:  sky130 does not define an LI mask fill
+# blockage layer, because LI fill requirements were added
+# to the process after the open PDK was made.  While
+# obstruction layers can be used in magic to block LI
+# fill, this does not translate into GDS, so running fill
+# on a GDS top level cell will result in LI fill shapes
+# being placed in the corner and under the seal ring.  To
+# work around this, I have added obsm1 to the layers that
+# obstruct LI, which is a bit of a hack but should not
+# cause issues in practice.
+#---------------------------------------------------------
+
+ templayer      obstruct_li_coarse allli,obsli,lifill,fillblock
+        grow    2800
+	or	alldiff,allpoly
+	grow	200
+	or	obsm1
+ templayer	lifill_coarse topbox
+        # slots   0 3000 650 0 3000 650 700 0
+        slots   0 3000 900 0 3000 900 700 0
+        and-not obstruct_li_coarse
+	and	topbox
+        shrink  1495
+        grow    1495
+
+ templayer      obstruct_li_medium allli,obsli,lifill,fillblock
+        grow    2500
+	or	lifill_coarse
+	grow	300
+	or	alldiff,allpoly
+        grow    200
+	or	obsm1
+ templayer	lifill_medium topbox
+        slots   0 1500 500 0 1500 500 700 0
+        and-not obstruct_li_medium
+	and	topbox
+        shrink  745
+        grow    745
+
+ templayer      obstruct_li_fine allli,obsli,lifill,fillblock
+	or	lifill_coarse,lifill_medium
+	grow	300
+	or	alldiff,allpoly
+        grow    200
+	or	obsm1
+ templayer	lifill_fine topbox
+        slots   0 580 500 0 580 500 700 0
+        and-not obstruct_li_fine
+	and	topbox
+        shrink  285
+        grow    285
+
+ layer	LIFILL  lifill_coarse
+	or	lifill_medium
+	or	lifill_fine
+ 	calma 	56 28
+
+#---------------------------------------------------
+# MET1 fill
+#---------------------------------------------------
+
+ templayer      obstruct_m1_coarse allm1,glass,obsm1,m1fill,fillblock
+        grow    3000
+ templayer	met1fill_coarse topbox
+        # slots   0 2000 200 0 2000 200 700 0
+        slots   0 2000 800 0 2000 800 700 350
+        and-not obstruct_m1_coarse
+	and	topbox
+        shrink  995
+        grow    995
+
+ templayer      obstruct_m1_medium allm1,glass,obsm1,m1fill,fillblock
+        grow    2800
+	or	met1fill_coarse
+        grow    200
+ templayer	met1fill_medium topbox
+        slots   0 1000 200 0 1000 200 700 0
+        and-not obstruct_m1_medium
+	and	topbox
+        shrink  495
+        grow    495
+
+ templayer      obstruct_m1_fine allm1,glass,obsm1,m1fill,fillblock
+        grow    300
+	or	met1fill_coarse,met1fill_medium
+        grow    200
+ templayer	met1fill_fine topbox
+        slots   0 580 200 0 580 200 700 0
+        and-not obstruct_m1_fine
+	and	topbox
+        shrink  285
+        grow    285
+
+ templayer      obstruct_m1_veryfine allm1,glass,obsm1,m1fill,fillblock
+        grow    100
+	or	met1fill_coarse,met1fill_medium,met1fill_fine
+        grow    200
+ templayer	met1fill_veryfine topbox
+        slots   0 300 200 0 300 200 100 50
+        and-not obstruct_m1_veryfine
+	and	topbox
+        shrink  145
+        grow    145
+
+ layer	MET1FILL met1fill_coarse
+	or	met1fill_medium
+	or	met1fill_fine
+	or	met1fill_veryfine
+ 	calma 	36 28
+
+#---------------------------------------------------
+# MET2 fill
+#---------------------------------------------------
+ templayer      obstruct_m2 allm2,glass,obsm2,m2fill,fillblock
+        grow    3000
+ templayer	met2fill_coarse topbox
+        # slots   0 2000 200 0 2000 200 700 350
+        slots   0 2000 800 0 2000 800 700 350
+        and-not obstruct_m2
+	and	topbox
+        shrink  995
+        grow    995
+
+ templayer      obstruct_m2_medium allm2,glass,obsm2,m2fill,fillblock
+        grow    2800
+	or	met2fill_coarse
+        grow    200
+ templayer	met2fill_medium topbox
+        slots   0 1000 200 0 1000 200 700 350
+        and-not obstruct_m2_medium
+	and	topbox
+        shrink  495
+        grow    495
+
+ templayer      obstruct_m2_fine allm2,glass,obsm2,m2fill,fillblock
+        grow    300
+	or	met2fill_coarse,met2fill_medium
+        grow    200
+ templayer	met2fill_fine topbox
+        slots   0 580 200 0 580 200 700 350
+        and-not obstruct_m2_fine
+	and	topbox
+        shrink  285
+        grow    285
+
+ templayer      obstruct_m2_veryfine allm2,glass,obsm2,m2fill,fillblock
+        grow    100
+	or	met2fill_coarse,met2fill_medium,met2fill_fine
+        grow    200
+ templayer	met2fill_veryfine topbox
+        slots   0 300 200 0 300 200 100 100
+        and-not obstruct_m2_veryfine
+	and	topbox
+        shrink  145
+        grow    145
+
+ layer	MET2FILL met2fill_coarse
+	or met2fill_medium
+	or met2fill_fine
+	or met2fill_veryfine
+ 	calma 	41 28
+
+#---------------------------------------------------
+# MET3 fill
+#---------------------------------------------------
+ templayer      obstruct_m3 allm3,glass,obsm3,m3fill,fillblock
+        grow    3000
+ templayer	met3fill_coarse topbox
+        # slots   0 2000 300 0 2000 300 700 700
+        slots   0 2000 800 0 2000 800 700 350
+        and-not obstruct_m3
+	and	topbox
+        shrink  995
+        grow    995
+
+ templayer      obstruct_m3_medium allm3,glass,obsm3,m3fill,fillblock
+        grow    2700
+	or	met3fill_coarse
+        grow    300
+ templayer	met3fill_medium topbox
+        slots   0 1000 300 0 1000 300 700 700
+        and-not obstruct_m3_medium
+	and	topbox
+        shrink  495
+        grow    495
+
+ templayer      obstruct_m3_fine allm3,glass,obsm3,m3fill,fillblock
+        grow    200
+	or	met3fill_coarse,met3fill_medium
+        grow    300
+ templayer	met3fill_fine topbox
+        slots   0 580 300 0 580 300 700 700
+        and-not obstruct_m3_fine
+	and	topbox
+        shrink  285
+        grow    285
+
+ templayer      obstruct_m3_veryfine allm3,glass,obsm3,m3fill,fillblock
+	# Note: Adding 0.1 to waffle rule to clear wide spacing rule
+        grow    100
+	or	met3fill_coarse,met3fill_medium,met3fill_fine
+        grow    300
+ templayer	met3fill_veryfine topbox
+        slots   0 500 300 0 500 300 150 200
+        and-not obstruct_m3_veryfine
+	and	topbox
+        shrink  245
+        grow    245
+
+ layer	MET3FILL met3fill_coarse
+	or	met3fill_medium
+	or	met3fill_fine
+	or	met3fill_veryfine
+ 	calma 	34 28
+
+#ifdef METAL5
+#---------------------------------------------------
+# MET4 fill
+#---------------------------------------------------
+ templayer      obstruct_m4 glass
+	grow	2500
+ 	or	allm4,obsm4,m4fill,fillblock
+        grow    3000
+ templayer	met4fill_coarse topbox
+        # slots   0 2000 300 0 2000 300 700 1050
+        slots   0 2000 800 0 2000 800 700 350
+        and-not obstruct_m4
+	and	topbox
+        shrink  995
+        grow    995
+
+ templayer	obstruct_m4_medium glass
+	grow	2500
+	or	allm4,obsm4,m4fill,fillblock
+        grow    2700
+	or	met4fill_coarse
+        grow    300
+ templayer	met4fill_medium topbox
+        slots   0 1000 300 0 1000 300 700 1050
+        and-not obstruct_m4_medium
+	and	topbox
+        shrink  495
+        grow    495
+
+ templayer      obstruct_m4_fine glass
+	grow	5000
+ 	or	allm4,obsm4,m4fill,fillblock
+        grow    200
+	or	met4fill_coarse,met4fill_medium
+        grow    300
+ templayer	met4fill_fine topbox
+        slots   0 580 300 0 580 300 700 1050
+        and-not obstruct_m4_fine
+	and	topbox
+        shrink  285
+        grow    285
+
+ templayer      obstruct_m4_veryfine glass
+	grow	5100
+	or	allm4,obsm4,m4fill,fillblock
+	# Note: Adding 0.1 to waffle rule to clear wide spacing rule
+        grow    100
+	or	met4fill_coarse,met4fill_medium,met4fill_fine
+        grow    300
+ templayer	met4fill_veryfine topbox
+        slots   0 500 300 0 500 300 150 300
+        and-not obstruct_m4_veryfine
+	and	topbox
+        shrink  245
+        grow    245
+
+ layer	MET4FILL met4fill_coarse
+	or	met4fill_medium
+	or	met4fill_fine
+	or	met4fill_veryfine
+ 	calma 	51 28
+
+#---------------------------------------------------
+# MET5 fill
+#---------------------------------------------------
+ templayer      obstruct_m5 allm5,glass,obsm5,m5fill,fillblock
+        grow    3000
+ templayer	met5fill_coarse topbox
+        slots   0 5000 1600 0 5000 1600 1000 100
+        and-not obstruct_m5
+	and	topbox
+        shrink  2495
+        grow    2495
+
+ templayer      obstruct_m5_medium allm5,glass,obsm5,m5fill,fillblock
+        grow    1400
+	or	met5fill_coarse
+        grow    1600
+ templayer	met5fill_medium topbox
+        slots   0 3000 1600 0 3000 1600 1000 100
+        and-not obstruct_m5_medium
+	and	topbox
+        shrink  1495
+        grow    1495
+
+ layer	MET5FILL met5fill_coarse
+	or	met5fill_medium
+ 	calma 	59 28
+#endif (METAL5)
+
+end
