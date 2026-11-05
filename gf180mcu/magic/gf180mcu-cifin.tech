@@ -1,0 +1,1293 @@
+###
+###	Source file gf180mcu-cifin.tech
+###	Process this file with the preproc.py macro processor
+###
+#----------------------------------------------------------
+# TECHNAME technology file:  cifinput section
+# Included by TECHNAME.tech
+#----------------------------------------------------------
+cifinput
+#-----------------------------------------------------------------------
+
+# NOTE:  All values in this section MUST be multiples of 25 
+# or else magic will scale below the allowed layout grid size
+
+style  import
+ scalefactor 50 nanometers
+ gridlimit 5
+
+ options ignore-unknown-layer-labels
+
+ ignore EFUSE
+ ignore SOURCE
+ ignore VTEXT
+ ignore SCRIBE
+ ignore LATCHUP_ID
+ ignore IO_ID
+ ignore ESD_ID
+
+ layer pwell PWELL,PWELLTXT
+ and-not BJTDEF,BJTDRC
+ labels PWELL
+ labels PWELLTXT port
+
+ layer pbase PWELL,PWELLTXT
+ and BJTDEF,BJTDRC
+
+ layer nwell NWELL,NWELLTXT
+ and-not BJTDEF,BJTDRC
+ labels NWELL
+ labels NWELLTXT port
+
+ templayer nwellarea NWELL
+ copyup nwelcheck
+
+ # Copy nwell areas up for diffusion checks
+ templayer xnwelcheck nwelcheck
+ copyup nwelcheck
+
+ layer nbase NWELL,NWELLTXT
+ and BJTDEF,BJTDRC
+
+ layer dnwell DNWELL
+ labels DNWELL
+
+ layer isosub SUBCUT
+ labels SUBCUT
+
+ # Implicit nwell defined by DNWELL outside of PWELL
+ templayer nwelldef DNWELL
+ shrink 500
+ and-not PWELL
+ or NWELL,nwelcheck
+
+ templayer ndiffarea DIFF
+ and-not POLY
+ and-not nwelldef
+ and-not PPLUS
+ and-not SBLK
+ and-not DUALGATE
+ and NPLUS
+ copyup ndifcheck
+
+ layer ndiff ndiffarea
+ labels DIFF
+
+ layer filldiff DIFFFILL
+ labels DIFFFILL
+
+ # Copy ndiff areas up for contact checks
+ templayer xndifcheck ndifcheck
+ copyup ndifcheck
+
+ templayer mvndiffarea DIFF
+ and-not POLY
+ and-not nwelldef
+ and-not PPLUS
+ and-not SBLK
+ and DUALGATE
+ and NPLUS
+ copyup mvndifcheck
+
+ templayer sramexpand SRAMDEF
+ grow 210
+
+ layer mvndiff mvndiffarea
+ and-not SRAMDEF
+
+ layer srammvndiff mvndiffarea
+ and SRAMDEF
+
+ layer sramndiff ndiffarea
+ and SRAMDEF
+
+ # Copy mvndiff areas up for contact checks
+ templayer mvxndifcheck mvndifcheck
+ copyup mvndifcheck
+
+ # Save cathode areas of Schottky diodes
+ templayer sccathode SCHOTTKY
+ and DIFF
+ and NPLUS
+
+ # Grow Schottky anode so that drawn device abuts
+ # the cathode.
+ layer schottky SCHOTTKY
+ and DIFF
+ and-not NPLUS
+ and-not PPLUS
+ or sccathode
+ grow 140
+ shrink 140
+ and-not sccathode
+
+ # Schottky contact
+ layer schottkyc SCHOTTKY
+ and CONT
+ and DIFF
+ and-not NPLUS
+ and-not PPLUS
+ grow 145
+ shrink 140
+
+ layer ndiode DIFF
+ and NPLUS
+ and DIODE
+ and-not nwelldef
+ and-not POLY
+ and-not PPLUS
+ and-not DUALGATE
+ and-not NAT
+
+ layer nndiode DIFF
+ and NPLUS
+ and DIODE
+ and-not nwelldef
+ and-not POLY
+ and-not PPLUS
+ and-not DUALGATE
+ and NAT
+
+ templayer ndiodearea DIODE
+ and NPLUS
+ and-not nwelldef
+ and-not DUALGATE
+ copyup DIODE,NPLUS
+
+ layer ndiffres DIFF
+ and-not POLY
+ and SBLK
+ and NPLUS
+ and-not DUALGATE
+
+ templayer pdiffarea DIFF
+ and-not POLY
+ and nwelldef
+ and-not NPLUS
+ and-not SBLK
+ and-not DIODE
+ and PPLUS
+ and-not DUALGATE
+ copyup pdifcheck
+
+ layer pdiff pdiffarea
+
+ layer mvndiode DIFF
+ and NPLUS
+ and DIODE
+ and-not POLY
+ and-not PPLUS
+ and DUALGATE
+ and-not NAT
+
+ layer mvnndiode DIFF
+ and NPLUS
+ and DIODE
+ and-not POLY
+ and-not PPLUS
+ and DUALGATE
+ and NAT
+
+ templayer mvndiodearea DIODE
+ and NPLUS
+ and-not nwelldef
+ and DUALGATE
+ copyup DIODE,NPLUS
+
+ layer mvndiffres DIFF
+ and-not POLY
+ and SBLK
+ and NPLUS
+ and DUALGATE
+
+ templayer mvpdiffarea DIFF
+ and-not POLY
+ and nwelldef
+ and-not NPLUS
+ and-not SBLK
+ and-not DIODE
+ and DUALGATE
+ and PPLUS
+ copyup mvpdifcheck
+
+ layer mvpdiff mvpdiffarea
+
+ # Copy pdiff areas up for contact checks
+ templayer xpdifcheck pdifcheck
+ copyup pdifcheck
+
+ layer pdiode DIFF
+ and PPLUS
+ and-not POLY
+ and-not NPLUS
+ and-not DUALGATE
+ and DIODE
+
+ templayer pdiodearea DIODE
+ and PPLUS
+ copyup DIODE,PPLUS
+
+ # Define pfet areas as known pdiff,
+ # regardless of the presence of a
+ # well.
+
+ templayer pfetarea DIFF
+ and-not NPLUS
+ and-not DUALGATE
+ and POLY
+
+ layer pfet pfetarea
+ and-not MOSCAP
+ and-not sramexpand
+
+ layer srampfet pfetarea
+ and-not MOSCAP
+ and sramexpand
+
+ layer pcap pfetarea
+ and MOSCAP
+
+ templayer pfetexpand pfetarea
+ grow 530
+
+ # Always force nwell under pfet
+ layer nwell pfetarea
+ grow 310
+
+ # Copy mvpdiff areas up for contact checks
+ templayer mvxpdifcheck mvpdifcheck
+ copyup mvpdifcheck
+
+ layer mvpdiode DIFF
+ and PPLUS
+ and-not POLY
+ and-not NPLUS
+ and-not RESDEF
+ and DUALGATE
+ and DIODE
+
+ templayer mvpdiodearea DIODE
+ and PPLUS
+ copyup DIODE,PPLUS
+
+ # Define pfet areas as known pdiff,
+ # regardless of the presence of a
+ # well.
+
+ templayer mvpfetarea DIFF
+ and DUALGATE
+ and-not NPLUS
+ and POLY
+
+ layer hvpfet mvpfetarea
+ and-not MOSCAP
+ and-not FET5VDEF
+ and-not sramexpand
+
+ layer mvpfet mvpfetarea
+ and-not MOSCAP
+ and FET5VDEF
+ and-not sramexpand
+
+ layer srammvpfet mvpfetarea
+ and-not MOSCAP
+ and sramexpand
+
+ layer mvpcap mvpfetarea
+ and MOSCAP
+ and-not sramexpand
+
+ templayer mvpfetexpand mvpfetarea
+ grow 520
+
+ layer pdiff DIFF
+ and-not DUALGATE
+ and-not NPLUS
+ and-not POLY
+ and nwelldef
+ and pfetexpand
+ and-not sramexpand
+
+ layer srampdiff DIFF
+ and-not DUALGATE
+ and-not NPLUS
+ and-not POLY
+ and nwelldef
+ and sramexpand
+
+ layer pdiffres DIFF
+ and-not POLY
+ and PPLUS
+ and nwelldef
+ and SBLK
+
+ layer nfet DIFF
+ and POLY
+ and-not PPLUS
+ and-not DUALGATE
+ and-not nwelldef
+ and NPLUS
+ and-not NAT
+ and-not MOSCAP
+ and-not sramexpand
+
+ layer sramnfet DIFF
+ and POLY
+ and-not PPLUS
+ and-not DUALGATE
+ and-not nwelldef
+ and NPLUS
+ and-not NAT
+ and-not MOSCAP
+ and sramexpand
+
+ layer ncap DIFF
+ and POLY
+ and-not PPLUS
+ and-not DUALGATE
+ and-not nwelldef
+ and NPLUS
+ and-not NAT
+ and MOSCAP
+
+ layer nnfet DIFF
+ and POLY
+ and-not PPLUS
+ and-not DUALGATE
+ and-not nwelldef
+ and NPLUS
+ and NAT
+
+ templayer nsdarea DIFF
+ and NPLUS
+ and nwelldef
+ and-not POLY
+ and-not PPLUS
+ and-not DUALGATE
+
+ layer nsd nsdarea
+
+ templayer nsdexpand nsdarea
+ grow 500
+
+ # Copy nsub areas up for contact checks
+ templayer xnsubcheck nsubcheck
+ copyup nsubcheck
+
+ templayer psdarea DIFF
+ and PPLUS
+ and-not DUALGATE
+ and-not nwelldef
+ and-not POLY
+ and-not NPLUS
+ and-not pfetexpand
+ copyup psubcheck
+
+ layer psd psdarea
+
+ templayer psdexpand psdarea
+ grow 500
+
+ layer mvpdiff DIFF
+ and-not NPLUS
+ and-not POLY
+ and nwelldef
+ and DUALGATE
+ and mvpfetexpand
+ and-not sramexpand
+
+ layer srammvpdiff DIFF
+ and-not NPLUS
+ and-not POLY
+ and nwelldef
+ and DUALGATE
+ and sramexpand
+
+ layer mvpdiffres DIFF
+ and-not POLY
+ and PPLUS
+ and SBLK
+ and DUALGATE
+
+ layer hvnfet DIFF
+ and POLY
+ and-not PPLUS
+ and NPLUS
+ and-not NAT
+ and-not nwelldef
+ and DUALGATE
+ and-not MOSCAP
+ and-not FET5VDEF
+ and-not sramexpand
+
+ layer mvnfet DIFF
+ and POLY
+ and-not PPLUS
+ and NPLUS
+ and-not NAT
+ and-not nwelldef
+ and DUALGATE
+ and-not MOSCAP
+ and FET5VDEF
+ and-not sramexpand
+
+ layer srammvnfet DIFF
+ and POLY
+ and-not PPLUS
+ and NPLUS
+ and-not NAT
+ and-not nwelldef
+ and DUALGATE
+ and-not MOSCAP
+ and sramexpand
+
+ layer mvncap DIFF
+ and POLY
+ and-not PPLUS
+ and NPLUS
+ and-not NAT
+ and-not nwelldef
+ and DUALGATE
+ and MOSCAP
+
+ layer mvnnfet DIFF
+ and POLY
+ and-not PPLUS
+ and NPLUS
+ and NAT
+ and-not nwelldef
+ and DUALGATE
+
+ templayer mvnsdarea DIFF
+ and NPLUS
+ and-not POLY
+ and-not PPLUS
+ and nwelldef
+ and DUALGATE
+ copyup mvnsubcheck
+
+ layer mvnsd mvnsdarea
+
+ templayer mvnsdexpand mvnsdarea
+ grow 500
+
+ # Copy nsub areas up for contact checks
+ templayer mvxnsubcheck mvnsubcheck
+ copyup mvnsubcheck
+
+ templayer mvpsdarea DIFF
+ and PPLUS
+ and-not nwelldef
+ and-not POLY
+ and-not NPLUS
+ and DUALGATE
+ and-not mvpfetexpand
+ copyup mvpsubcheck
+
+ layer mvpsd mvpsdarea
+
+ templayer mvpsdexpand mvpsdarea
+ grow 500
+
+ # Copy psub areas up for contact checks
+ templayer xpsubcheck psubcheck
+ copyup psubcheck
+
+ templayer mvxpsubcheck mvpsubcheck
+ copyup mvpsubcheck
+
+ layer psd DIFF
+ and-not PPLUS
+ and-not NPLUS
+ and-not POLY
+ and-not DUALGATE
+ and-not pfetexpand
+ and psdexpand
+
+ layer nsd DIFF
+ and-not PPLUS
+ and-not NPLUS
+ and-not POLY
+ and nwelldef
+ and-not DUALGATE
+ and nsdexpand
+
+ layer mvpsd DIFF
+ and-not PPLUS
+ and-not NPLUS
+ and-not POLY
+ and-not nwelldef
+ and DUALGATE
+ and-not mvpfetexpand
+ and mvpsdexpand
+
+ layer mvnsd DIFF
+ and-not PPLUS
+ and-not NPLUS
+ and-not POLY
+ and nwelldef
+ and DUALGATE
+ and mvnsdexpand
+
+ templayer polyarea POLY
+ and-not DIFF
+ and-not SBLK
+ and-not PLFUSE
+#ifdef HRPOLY1K
+ and-not HRES
+#endif (HRPOLY1K)
+ copyup polycheck
+
+ layer poly polyarea,POLYTXT
+ and-not RESDEF
+ labels POLY
+ labels POLYTXT text
+
+ layer fillpoly POLYFILL
+ labels POLYFILL
+
+ # Copy poly areas up for contact checks
+ templayer xpolycheck polycheck
+ copyup polycheck
+
+ layer rpps POLY
+ and-not SBLK
+ and PPLUS
+ and RESDEF
+
+ layer rnps POLY
+ and-not SBLK
+ and NPLUS
+ and RESDEF
+
+ layer rpp POLY
+ and SBLK
+ and PPLUS
+#ifdef HRPOLY1K
+ and-not HRES
+#endif (HRPOLY1K)
+ and RESDEF
+
+ # POLY + SBLK without RESDEF may be a salicide-blocked transistor.
+ # The SBLK will be regenerated on GDS output and the poly should be
+ # treated as regular poly.
+ layer poly POLY
+ and-not DIFF
+ and SBLK
+ and-not RESDEF
+
+ layer efuse POLY
+ and-not DIFF
+ and PLFUSE
+
+ layer rnp POLY
+ and SBLK
+ and NPLUS
+ and RESDEF
+#ifdef HRPOLY1K
+ and-not HRES
+#endif (HRPOLY1K)
+
+#ifdef HRPOLY1K
+ layer hires POLY
+ and SBLK
+ and HRES
+ and RESDEF
+ and-not DUALGATE
+
+ layer mvhires POLY
+ and SBLK
+ and HRES
+ and RESDEF
+ and DUALGATE
+
+ # We define poly under HRES but not under SBLK to be plain poly
+ layer poly POLY
+ and HRES
+ and-not SBLK
+ and-not RESDEF
+#endif (HRPOLY1K)
+
+ layer ndc CONT
+ and DIFF
+ and NPLUS
+ and-not nwelldef
+ and MET1
+ and-not DUALGATE
+ and-not DIODE
+ and-not sramexpand
+ grow 145
+ shrink 140
+
+ layer sramndc CONT
+ and DIFF
+ and NPLUS
+ and-not nwelldef
+ and MET1
+ and-not DUALGATE
+ and-not DIODE
+ and sramexpand
+ grow 145
+ shrink 140
+
+ layer nsc CONT
+ and DIFF
+ and NPLUS
+ and nwelldef
+ and MET1
+ and-not DUALGATE
+ and-not DIODE
+ grow 145
+ shrink 140
+
+ layer pdc CONT
+ and DIFF
+ and PPLUS
+ and nwelldef
+ and MET1
+ and-not DUALGATE
+ and-not DIODE
+ and-not sramexpand
+ grow 145
+ shrink 140
+
+ layer pdc CONT
+ and DIFF
+ and PPLUS
+ and MET1
+ and-not DUALGATE
+ and-not DIODE
+ and pfetexpand
+ and-not sramexpand
+ grow 145
+ shrink 140
+
+ layer srampdc CONT
+ and DIFF
+ and PPLUS
+ and MET1
+ and-not DUALGATE
+ and-not DIODE
+ and sramexpand
+ grow 145
+ shrink 140
+
+ layer psc CONT
+ and DIFF
+ and PPLUS
+ and-not nwelldef
+ and MET1
+ and-not DUALGATE
+ and-not DIODE
+ and-not pfetexpand
+ grow 145
+ shrink 140
+
+ layer pc CONT
+ and POLY
+ and-not DIFF
+ and MET1
+ grow 145
+ shrink 140
+
+ layer ndic CONT
+ and DIFF
+ and NPLUS
+ and DIODE
+ and-not POLY
+ and-not PPLUS
+ and-not DUALGATE
+ and-not NAT
+ grow 145
+ shrink 140
+
+ layer nndic CONT
+ and DIFF
+ and NPLUS
+ and DIODE
+ and-not POLY
+ and-not PPLUS
+ and-not DUALGATE
+ and NAT
+ grow 145
+ shrink 140
+
+ layer pdic CONT
+ and DIFF
+ and PPLUS
+ and DIODE
+ and-not POLY
+ and-not NPLUS
+ and-not DUALGATE
+ grow 145
+ shrink 140
+
+ layer mvndc CONT
+ and DIFF
+ and NPLUS
+ and-not nwelldef
+ and MET1
+ and DUALGATE
+ and-not DIODE
+ and-not sramexpand
+ grow 145
+ shrink 140
+
+ layer srammvndc CONT
+ and DIFF
+ and NPLUS
+ and-not nwelldef
+ and MET1
+ and DUALGATE
+ and-not DIODE
+ and sramexpand
+ grow 145
+ shrink 140
+
+ layer mvnsc CONT
+ and DIFF
+ and NPLUS
+ and MET1
+ and DUALGATE
+ and nwelldef
+ and-not DIODE
+ grow 145
+ shrink 140
+
+ layer mvpdc CONT
+ and DIFF
+ and PPLUS
+ and MET1
+ and DUALGATE
+ and nwelldef
+ and-not DIODE
+ and-not sramexpand
+ grow 145
+ shrink 140
+
+ layer mvpdc CONT
+ and DIFF
+ and PPLUS
+ and MET1
+ and DUALGATE
+ and-not DIODE
+ and mvpfetexpand
+ and-not sramexpand
+ grow 145
+ shrink 140
+
+ layer srammvpdc CONT
+ and DIFF
+ and PPLUS
+ and MET1
+ and DUALGATE
+ and nwelldef
+ and-not DIODE
+ and sramexpand
+ grow 145
+ shrink 140
+
+ layer mvpsc CONT
+ and DIFF
+ and PPLUS
+ and-not nwelldef
+ and MET1
+ and DUALGATE
+ and-not DIODE
+ and-not mvpfetexpand
+ grow 145
+ shrink 140
+
+ layer mvndic CONT
+ and DIFF
+ and NPLUS
+ and DIODE
+ and-not POLY
+ and-not PPLUS
+ and DUALGATE
+ and-not NAT
+ grow 145
+ shrink 140
+
+ layer mvnndic CONT
+ and DIFF
+ and NPLUS
+ and DIODE
+ and-not POLY
+ and-not PPLUS
+ and DUALGATE
+ and NAT
+ grow 145
+ shrink 140
+
+ layer mvpdic CONT
+ and DIFF
+ and PPLUS
+ and DIODE
+ and-not POLY
+ and-not NPLUS
+ and DUALGATE
+ grow 145
+ shrink 140
+
+ layer rm1 MET1
+ and RESDEF
+ and MET1RES
+
+ layer m1 MET1,MET1TXT
+ and-not MET1RES
+ labels MET1
+ labels MET1TXT port
+
+ layer obsm1 M1BLOCK
+ labels M1BLOCK
+
+ layer fillm1 M1FILL
+ labels M1FILL
+
+ layer m2c VIA1
+ grow 130
+ shrink 130
+
+ layer rm2 MET2
+ and RESDEF
+ and MET2RES
+
+ layer m2 MET2,MET2TXT
+ and-not MET2RES
+ labels MET2
+ labels MET2TXT port
+
+ layer obsm2 M2BLOCK
+ labels M2BLOCK
+
+ layer fillm2 M2FILL
+ labels M2FILL
+
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ layer rm3 MET3
+ and RESDEF
+ and MET3RES
+
+#ifdef METALS3 && MIM
+ templayer mimarea CAPDEF
+ and MET3
+#endif (METALS3 && MIM)
+
+ layer m3 MET3,MET3TXT
+ and-not MET3RES
+ labels MET3
+ labels MET3TXT port
+
+ layer obsm3 M3BLOCK
+ labels M3BLOCK
+
+ layer fillm3 M3FILL
+ labels M3FILL
+
+ layer m3c VIA2
+#ifdef METALS3 && MIM
+ and-not CAPM
+ and-not mimarea
+#endif (METALS3 && MIM)
+ grow 140
+ shrink 130
+
+#ifdef METALS3 && MIM
+ layer mimcc VIA2
+ and MET3
+ and CAPM
+ and CAPDEF
+ grow 260
+ shrink 250
+#endif (METALS3 && MIM)
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4 || METALS5 || METALS6
+ layer rm4 MET4
+ and RESDEF
+ and MET4RES
+
+#ifdef METALS4 && MIM
+ templayer mimarea CAPDEF
+ and MET3
+#endif (METALS4 && MIM)
+
+ layer m4 MET4,MET4TXT
+ and-not MET4RES
+ labels MET4
+ labels MET4TXT port
+
+ layer obsm4 M4BLOCK
+ labels M4BLOCK
+
+ layer fillm4 M4FILL
+ labels M4FILL
+
+ layer via3 VIA3
+#ifdef METALS4 && MIM
+ and-not CAPM
+ and-not mimarea
+#endif (METALS4 && MIM)
+ grow 140
+ shrink 130
+
+#ifdef METALS4 && MIM
+ layer mimcc VIA3
+ and MET4
+ and CAPM
+ and CAPDEF
+ grow 260
+ shrink 250
+#endif (METALS4 && MIM)
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS5 || METALS6
+ layer rm5 MET5
+ and RESDEF
+ and MET5RES
+
+#ifdef METALS5 && MIM
+ templayer mimarea CAPDEF
+ and MET4
+#endif (METALS5 && MIM)
+
+ layer m5 MET5,MET5TXT
+ and-not MET5RES
+ labels MET5
+ labels MET5TXT port
+
+ layer obsm5 M5BLOCK
+ labels M5BLOCK
+
+ layer fillm5 M5FILL
+ labels M5FILL
+
+ layer via4 VIA4
+#ifdef MIM && METALS5
+ and-not CAPM
+ and-not mimarea
+#endif (MIM && METALS5)
+ grow 140
+ shrink 130
+
+#ifdef METALS5 && MIM
+ layer mimcc VIA4
+ and MET5
+ and CAPM
+ and CAPDEF
+ grow 260
+ shrink 250
+#endif (METALS5 && MIM)
+#endif (METALS5 || METALS6)
+
+#ifdef METALS6
+ layer rmtp METTP
+ and RESDEF
+ and METTPRES
+
+ layer mtp METTP,METTPTXT
+ and-not METTPRES
+ labels METTP
+ labels METTPTXT port
+
+ layer obsmtp MTPBLOCK
+ labels MTPBLOCK
+
+ layer fillmtp MTPFILL
+ labels MTPFILL
+
+#ifdef MIM
+ templayer mimarea CAPDEF
+ and MET5
+#endif (MIM)
+
+ layer viatp VIATP
+ and METTP
+#ifdef MIM
+ and-not CAPM
+ and-not mimarea
+#endif (MIM)
+ grow 5
+ grow 265
+ shrink 265
+
+#ifdef MIM
+ layer mimcc VIATP
+ and METTP
+ and CAPM
+ and CAPDEF
+ grow 260
+ shrink 250
+#endif (MIM)
+#endif (METALS6)
+
+#ifdef MIM
+ layer mimcap CAPM
+ and CAPDEF
+ labels CAPM
+
+ templayer nolayer CAP_LENGTH
+#endif (MIM)
+
+ # Find diffusion not covered in
+ # NPLUS or PPLUS and pull it into
+ # the next layer up
+
+ templayer gentrans DIFF
+ and-not PPLUS
+ and-not NPLUS
+ and POLY
+ copyup DIFF,POLY
+
+ templayer gendiff DIFF
+ and-not PPLUS
+ and-not NPLUS
+ and-not POLY
+ copyup DIFF
+
+ # Handle contacts found by copyup
+
+ layer ndic CONT
+ and MET1
+ and DIODE
+ and NPLUS
+ and-not DUALGATE
+ and-not NAT
+ grow 100
+ shrink 100
+
+ layer mvndic CONT
+ and MET1
+ and DIODE
+ and NPLUS
+ and DUALGATE
+ and-not NAT
+ grow 100
+ shrink 100
+
+ layer mvnndic CONT
+ and MET1
+ and DIODE
+ and NPLUS
+ and DUALGATE
+ and NAT
+ grow 100
+ shrink 100
+
+ layer pdic CONT
+ and MET1
+ and DIODE
+ and PPLUS
+ and-not DUALGATE
+ grow 100
+ shrink 100
+
+ layer mvpdic CONT
+ and MET1
+ and DIODE
+ and PPLUS
+ and DUALGATE
+ grow 100
+ shrink 100
+
+ layer ndc CONT
+ and ndifcheck
+ grow 100
+ shrink 100
+
+ layer mvndc CONT
+ and mvndifcheck
+ grow 100
+ shrink 100
+
+ layer pdc CONT
+ and pdifcheck
+ grow 100
+ shrink 100
+
+ layer mvpdc CONT
+ and mvpdifcheck
+ grow 100
+ shrink 100
+
+ layer pc CONT
+ and polycheck
+ grow 100
+ shrink 100
+
+ layer nsc CONT
+ and nsubcheck
+ grow 100
+ shrink 100
+
+ layer mvnsc CONT
+ and mvnsubcheck
+ grow 100
+ shrink 100
+
+ layer psc CONT
+ and psubcheck
+ grow 100
+ shrink 100
+
+ layer mvpsc CONT
+ and mvpsubcheck
+ grow 100
+ shrink 100
+
+ # Find contacts not covered in
+ # metal and pull them into the
+ # next layer up
+ 
+ templayer gencont CONT
+ and MET1
+ and-not DIFF
+ and-not POLY
+ and-not DIODE
+ and-not nsubcheck
+ and-not psubcheck
+ and-not mvnsubcheck
+ and-not mvpsubcheck
+ copyup CONT,MET1
+
+ templayer barecont CONT
+ and-not MET1
+ and-not nsubcheck
+ and-not psubcheck
+ and-not mvnsubcheck
+ and-not mvpsubcheck
+ copyup CONT
+
+ layer glass GLASS
+ labels GLASS
+
+ templayer cellbound BOUND,PRBOUND
+ boundary
+
+ layer lvstext TTEXT
+ labels TTEXT text
+
+ layer fillblock  FILLOBS2
+ labels FILLOBS2
+
+ templayer fillobs FILLOBS
+ mask-hints NDMY
+
+# MOS Varactors
+
+ layer nvar POLY
+ and DIFF
+ and NPLUS
+ and nwelldef
+ and-not DUALGATE
+
+ layer mvnvar POLY
+ and DIFF
+ and NPLUS
+ and nwelldef
+ and DUALGATE
+
+ layer pvar POLY
+ and DIFF
+ and PPLUS
+ and-not nwelldef
+ and-not DUALGATE
+
+ layer mvpvar POLY
+ and DIFF
+ and PPLUS
+ and-not nwelldef
+ and DUALGATE
+
+ calma DNWELL 12 0
+ calma NWELL 21 0
+ calma NWELLTXT 21 10
+ calma PWELL 204 0
+ calma PWELLTXT 204 10
+ calma SUBCUT 23 5
+ calma DIFF 22 0
+ calma DIFFFILL 22 4
+ calma POLY 30 0
+ calma POLYFILL 30 4
+ calma POLYTXT 30 10
+ calma NPLUS 32 0
+ calma PPLUS 31 0
+ calma SBLK 49 0
+ calma GLASS 37 0
+ calma CONT 33 0
+ calma MET1 34 0
+ calma MET1TXT 34 10
+ calma M1BLOCK 34 5
+ calma M1FILL 34 4
+ calma MET2RES 110 11
+ calma VIA1 35 0
+ calma MET2 36 0
+ calma MET2TXT 36 10
+ calma M2BLOCK 36 5
+ calma M2FILL 36 4
+ calma MET2RES 110 12
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ calma VIA2 38 0
+ calma MET3 42 0
+ calma MET3TXT 42 10
+ calma M3BLOCK 42 5
+ calma M3FILL 42 4
+ calma MET3RES 110 13
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+#ifdef METALS4 || METALS5 || METALS6
+ calma VIA3 40 0
+ calma MET4 46 0
+ calma MET4TXT 46 10
+ calma M4BLOCK 46 5
+ calma M4FILL 46 4
+ calma MET4RES 110 14
+#endif (METALS4 || METALS5 || METALS6)
+#ifdef METALS5 || METALS6
+ calma VIA4 41 0
+ calma MET5 81 0
+ calma MET5TXT 81 10
+ calma M5BLOCK 81 5
+ calma M5FILL 81 4
+ calma MET5RES 110 15
+#endif (METALS5 || METALS6)
+#ifdef METALS6
+ calma VIATP 129 0
+ calma METTP 53 0
+ calma METTPTXT 53 10
+ calma MTPBLOCK 53 5
+ calma METTPRES 110 16
+#endif (METALS6)
+#ifdef HRPOLY1K
+ calma HRES 62 0
+#endif (HRPOLY1K)
+ calma EFUSE 80 5
+ calma PLFUSE 125 5
+ calma SOURCE 100 8
+ calma NAT 5 0
+#ifdef MIM
+ calma CAPM 75 0
+ calma CAP_LENGTH 117 10
+#endif (MIM)
+ calma DIODE  115 5
+ calma SCHOTTKY 241 0
+ calma CAPDEF 117 5
+ calma BJTDEF 118 5
+ calma BJTDRC 127 5
+ calma MOSCAP 166 5
+ calma BOUND 0 0
+ calma PRBOUND 63 0
+ calma VTEXT 63 63
+ calma FILLOBS  111 5
+ calma FILLOBS2 152 5
+ calma TTEXT    230 *
+ calma RESDEF   110 *
+ calma DUALGATE 55 0
+ calma SRAMDEF  108 5
+ calma FET5VDEF 112 1
+ calma SCRIBE	167 5
+ calma LATCHUP_ID 137 5
+ calma IO_ID	119 5
+ calma ESD_ID	24 5
+
+end

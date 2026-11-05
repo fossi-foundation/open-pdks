@@ -539,6 +539,11 @@ IRSIM_CORNERS = `ls irsim/*.prm | cut -c14-`
 # mangle non-C source files under the belief that they are actually C code.
 CPP   = ../common/preproc.py
 
+# Magic technology file sections and device generator scripts that are
+# kept in separate files.
+MAGIC_TECH_PARTS = cifout cifin drc extract
+MAGIC_TCL_PARTS = util misc via fet cap res dio fix
+
 # The following script in the ../common directory does most of the work of
 # copying or linking the foundry vendor files to the target directory.
 STAGE = set -f ; ../common/foundry_install.py -std_format ${TIMESTAMP_OPT}
@@ -1021,13 +1026,17 @@ tools-A: $(addsuffix -A, $(TOOLS))
 
 tools-B: $(addsuffix -B, $(TOOLS))
 
-magic-%: magic/${TECH}.tech magic/${TECH}gds.tech magic/${TECH}.magicrc magic/${TECH}.tcl
+magic-%: magic/${TECH}.tech magic/${TECH}gds.tech magic/${TECH}.magicrc magic/${TECH}.tcl \
+		${MAGIC_TECH_PARTS:%=magic/${TECH}-%.tech} \
+		${MAGIC_TCL_PARTS:%=magic/${TECH}-%.tcl}
 	mkdir -p ${MAGICTOP_STAGING_$*}
 	mkdir -p ${MAGIC_STAGING_$*}
 	rm -f ${MAGICTOP_STAGING_$*}/current
 	rm -f ${MAGIC_STAGING_$*}/${SKY130$*}.tech
 	rm -f ${MAGIC_STAGING_$*}/${SKY130$*}-GDS.tech
 	rm -f ${MAGIC_STAGING_$*}/${SKY130$*}.tcl
+	rm -f ${MAGIC_TECH_PARTS:%=${MAGIC_STAGING_$*}/${SKY130$*}-%.tech}
+	rm -f ${MAGIC_TCL_PARTS:%=${MAGIC_STAGING_$*}/${SKY130$*}-%.tcl}
 	rm -f ${MAGIC_STAGING_$*}/${SKY130$*}-BindKeys
 	rm -f ${MAGIC_STAGING_$*}/magicrc
 	cp -rp custom/scripts/seal_ring_generator ${MAGIC_STAGING_$*}/.
@@ -1040,11 +1049,19 @@ magic-%: magic/${TECH}.tech magic/${TECH}gds.tech magic/${TECH}.magicrc magic/${
 	${CPP} ${SKY130$*_DEFS} custom/scripts/check_antenna.py \
 		${MAGIC_STAGING_$*}/check_antenna.py
 	${CPP} ${SKY130$*_DEFS} magic/${TECH}.tech ${MAGIC_STAGING_$*}/${SKY130$*}.tech
+	for part in ${MAGIC_TECH_PARTS} ; do \
+		${CPP} ${SKY130$*_DEFS} magic/${TECH}-$$part.tech \
+			${MAGIC_STAGING_$*}/${SKY130$*}-$$part.tech ; \
+	done
 	${CPP} ${SKY130$*_DEFS} magic/${TECH}gds.tech ${MAGIC_STAGING_$*}/${SKY130$*}-GDS.tech
 	${CPP} ${SKY130$*_DEFS} magic/${TECH}.magicrc ${MAGIC_STAGING_$*}/${SKY130$*}.magicrc
 	${CPP} ${SKY130$*_DEFS} ../common/pdk.bindkeys ${MAGIC_STAGING_$*}/${SKY130$*}-BindKeys
 	${CPP} ${SKY130$*_DEFS} magic/${TECH}.tcl ${MAGIC_STAGING_$*}/${SKY130$*}.tcl
 	${CPP} ${SKY130$*_DEFS} ../common/pdk.tcl >> ${MAGIC_STAGING_$*}/${SKY130$*}.tcl
+	for part in ${MAGIC_TCL_PARTS} ; do \
+		${CPP} ${SKY130$*_DEFS} magic/${TECH}-$$part.tcl \
+			${MAGIC_STAGING_$*}/${SKY130$*}-$$part.tcl ; \
+	done
 
 qflow-%: qflow/${TECH}.sh qflow/${TECH}.par
 	mkdir -p ${QFLOWTOP_STAGING_$*}

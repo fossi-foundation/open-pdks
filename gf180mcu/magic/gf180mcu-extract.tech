@@ -1,0 +1,1374 @@
+###
+###	Source file gf180mcu-extract.tech
+###	Process this file with the preproc.py macro processor
+###
+#----------------------------------------------------------
+# TECHNAME technology file:  Extraction rules
+# Included by TECHNAME.tech
+#----------------------------------------------------------
+extract
+ style ngspice variants (),(hrhc),(lrhc),(hrlc),(lrlc)
+ cscale 1
+ lambda  5.0
+ units	microns
+ step   7
+ sidehalo 8
+ fringeshieldhalo 8
+
+ planeorder dwell	0
+ planeorder well 	1
+ planeorder active 	2
+ planeorder poly 	3
+ planeorder metal1 	4
+ planeorder metal2 	5
+#ifdef METALS3
+ planeorder metal3 	6
+ planeorder block       7
+ planeorder comment     8
+#elseif defined(METALS4)
+ planeorder metal3 	6
+ planeorder metal4 	7
+ planeorder block       8
+ planeorder comment     9
+#elseif defined(METALS5)
+ planeorder metal3 	6
+ planeorder metal4 	7
+ planeorder metal5 	8
+ planeorder block       9
+ planeorder comment     10
+#elseif defined(METALS6)
+ planeorder metal3 	6
+ planeorder metal4 	7
+ planeorder metal5 	8
+ planeorder metaltp 	9
+ planeorder block       10
+ planeorder comment     11
+#endif
+
+ height dnwell	       -0.1	0.0	
+ height nwell,pwell	0.0	0.0145
+ height alldiff		0.0145	0.30
+ height allpoly		0.32	0.2
+ height alldiffcont	0.3145	0.9155
+ height pc		0.52	0.71
+ height allm1		1.23	0.55
+ height via		1.78	0.60
+ height allm2		2.38	0.55
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ height via2		2.93	0.60
+ height allm3		3.53	0.55
+#endif
+#ifdef METALS4 || METALS5 || METALS6
+ height via3		4.08	0.60
+ height allm4		4.68	0.55
+#endif
+#ifdef METALS5 || METALS6
+ height via4		5.23	0.60
+#endif
+#ifdef METALS5
+ height allm5		5.83	1.0025
+#endif
+#ifdef METALS6
+ height allm5		5.83	0.55
+#endif
+#ifdef METALS6
+ height viatp		6.38	0.9	
+ height allmtp		7.28	1.0025
+#endif
+ 
+ # Antenna check parameters
+ # (to be completed)
+ model partial
+ antenna poly sidewall 200 none
+ antenna allcont surface 10 none
+ antenna via1 surface 20 none
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ antenna via2 surface 20 none
+#endif
+#ifdef METALS4 || METALS5 || METALS6
+ antenna via3 surface 20 none
+#endif
+#ifdef METALS5 || METALS6
+ antenna via4 surface 20 none
+#endif
+#ifdef METALS6
+ antenna viatp surface 20 none
+#endif
+#ifdef MIM
+ antenna mimcc surface 20 none
+#endif
+ antenna m1,m2 sidewall 400 none
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ antenna m3 sidewall 400 none
+#endif
+#ifdef METALS4 || METALS5 || METALS6
+ antenna m4 sidewall 400 none
+#endif
+#ifdef METALS5 || METALS6
+ antenna m5 sidewall 400 none
+#endif
+#ifdef METALS6
+ antenna mtp sidewall 400 none
+#endif
+
+ tiedown alldiffnonfet
+
+ substrate *ppdiff,*mvppdiff,space/w,pwell well $SUB -dnwell,isosub
+
+# Layer resistance
+
+variants ()
+
+# Resistances are in milliohms per square
+# Optional 3rd argument is the corner adjustment fraction
+# See document 180MCU_YI-141-EP059-01_10.pdf
+
+ resist (nwell,dnwell)/well      1000000
+ resist (pwell,isosub)/well 	 3250000
+
+ resist (*sramndiff,*ndiff,nsd)/active 	  6300
+ resist (*srampdiff,*pdiff,*psd)/active	  7000
+ resist (*srammvndiff,*mvndiff,mvnsd)/active   6300
+ resist (*srammvpdiff,*mvpdiff,*mvpsd)/active  7000
+
+ resist (allpolynonres)/active    7300
+
+ resist (rnw)/well             1000000 0.5
+ resist (rnd)/active 	 	 60000 0.5
+ resist (rpd)/active 		185000 0.5
+ resist (mvrnd)/active 		 60000 0.5
+ resist (mvrpd)/active 		185000 0.5
+ resist (rnds)/active 	 	  6300 0.5
+ resist (rpds)/active 		  7000 0.5
+ resist (mvrnds)/active		  6300 0.5
+ resist (mvrpds)/active		  7000 0.5
+ resist (rnps)/active	  	  6800 0.5
+ resist (rpps)/active	  	  7300 0.5
+ resist (rpp)/active		350000 0.5
+ resist (rnp)/active		310000 0.5
+#ifdef HRPOLY1K
+ resist (hires,mvhires)/active 1000000 0.5
+#endif (HRPOLY1K)
+
+ resist (allm1)/metal1		    90
+ resist (allm2)/metal2		    90
+#ifdef METALS3
+#ifdef THICKMET3P0
+ resist (allm3)/metal3  	    10
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allm3)/metal3  	    40
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allm3)/metal3  	    60
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS3)
+#ifdef METALS4 || METALS5 || METALS6
+ resist (allm3)/metal3	            90
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4
+#ifdef THICKMET3P0
+ resist (allm4)/metal4  	    10
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allm4)/metal4  	    40
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allm4)/metal4  	    60
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS4)
+#ifdef METALS5 || METALS6
+ resist (allm4)/metal4  	    90
+#endif (METALS5 || METALS6)
+
+#ifdef METALS5
+#ifdef THICKMET3P0
+ resist (allm5)/metal5  	    10
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allm5)/metal5  	    40
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allm5)/metal5  	    60
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS5)
+#ifdef METALS6
+ resist (allm5)/metal5  	    90
+#endif (METALS6)
+
+#ifdef METALS6
+#ifdef THICKMET3P0
+ resist (allmtp)/metaltp  	   10
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allmtp)/metaltp  	    40
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allmtp)/metaltp  	    60
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS6)
+
+ contact ndc,nsc,ndic,nndic	  6300
+ contact pdc,psc,pdic		  5200
+ contact mvndc,mvnsc,mvndic,mvnndic  6300
+ contact mvpdc,mvpsc,mvpdic	  5200
+ contact pc			  8000
+ contact m2c			  4500
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ contact m3c			  4500
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+#ifdef METALS4 || METALS5 || METALS6
+ contact via3			  4500
+#endif (METALS4 || METALS5 || METALS6)
+#ifdef METALS5 || METALS6
+ contact via4			  4500
+#endif (METALS5 || METALS6)
+#ifdef MIM
+ contact mimcc			  4500
+#endif (MIM)
+#ifdef METALS6
+ contact viatp			  4500
+#endif (METALS6)
+
+variants (hrhc),(hrlc)
+
+ # High-end corner resistances (milliohms per square)
+
+ resist (nwell,dnwell)/well      1200000
+ resist (pwell,isosub)/well 	 3250000
+
+ resist (*sramndiff,*ndiff,nsd)/active 	 15000
+ resist (*srampdiff,*pdiff,*psd)/active	 15000
+ resist (*srammvndiff,*mvndiff,mvnsd)/active  15000
+ resist (*srammvpdiff,*mvpdiff,*mvpsd)/active 15000
+
+ resist (allpolynonres)/active   15000
+
+ resist (rnw)/well             1200000 0.5
+ resist (rnd)/active 	 	 75000 0.5
+ resist (rpd)/active 		225000 0.5
+ resist (mvrnd)/active 		 75000 0.5
+ resist (mvrpd)/active 		225000 0.5
+ resist (rnds)/active 	 	 15000 0.5
+ resist (rpds)/active 		 15000 0.5
+ resist (mvrnds)/active		 15000 0.5
+ resist (mvrpds)/active		 15000 0.5
+ resist (rnps)/active	  	 15000 0.5
+ resist (rpps)/active	  	 15000 0.5
+ resist (rpp)/active		420000 0.5
+ resist (rnp)/active		370000 0.5
+#ifdef HRPOLY1K
+ resist (hires,mvhires)/active	1200000 0.5
+#endif (HRPOLY1K)
+
+ resist (allm1)/metal1		   104
+ resist (allm2)/metal2		   104
+#ifdef METALS3
+#ifdef THICKMET3P0
+ resist (allm3)/metal3  	    15
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allm3)/metal3  	    49
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allm3)/metal3  	    70
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS3)
+#ifdef METALS4 || METALS5 || METALS6
+ resist (allm3)/metal3	           104
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4
+#ifdef THICKMET3P0
+ resist (allm4)/metal4  	    14
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allm4)/metal4  	    49
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allm4)/metal4  	    70
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS4)
+#ifdef METALS5 || METALS6
+ resist (allm4)/metal4  	   104
+#endif (METALS5 || METALS6)
+
+#ifdef METALS5
+#ifdef THICKMET3P0
+ resist (allm5)/metal5  	    14
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allm5)/metal5  	    49
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allm5)/metal5  	    70
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS5)
+#ifdef METALS6
+ resist (allm5)/metal5  	   104
+#endif (METALS6)
+
+#ifdef METALS6
+#ifdef THICKMET3P0
+ resist (allmtp)/metaltp  	    14
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allmtp)/metaltp  	    49
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allmtp)/metaltp  	    70
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS6)
+
+ contact ndc,nsc,ndic,nndic	 15000
+ contact pdc,psc,pdic		 15000
+ contact mvndc,mvnsc,mvndic,mvnndic 15000
+ contact mvpdc,mvpsc,mvpdic	 15000
+ contact pc			 15000
+ contact m2c			 15000
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ contact m3c			 15000
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+#ifdef METALS4 || METALS5 || METALS6
+ contact via3			 15000
+#endif (METALS4 || METALS5 || METALS6)
+#ifdef METALS5 || METALS6
+ contact via4			 15000
+#endif (METALS5 || METALS6)
+#ifdef MIM
+ contact mimcc			 15000
+#endif (MIM)
+#ifdef METALS6
+ contact viatp			 15000
+#endif (METALS6)
+
+variants (lrhc),(lrlc)
+
+ # Low-end corner resistances (milliohms per square)
+
+ resist (nwell,dnwell)/well       800000
+ resist (pwell,isosub)/well 	 3250000
+
+ resist (*sramndiff,*ndiff,nsd)/active 	  1000
+ resist (*srampdiff,*pdiff,*psd)/active	  1000
+ resist (*srammvndiff,*mvndiff,mvnsd)/active   1000
+ resist (*srammvpdiff,*mvpdiff,*mvpsd)/active  1000
+
+ resist (allpolynonres)/active    1000
+
+ resist (rnw)/well             8000000 0.5
+ resist (rnd)/active 	 	 45000 0.5
+ resist (rpd)/active 		145000 0.5
+ resist (mvrnd)/active 		 45000 0.5
+ resist (mvrpd)/active 		145000 0.5
+ resist (rnds)/active 	 	  1000 0.5
+ resist (rpds)/active 		  1000 0.5
+ resist (mvrnds)/active		  1000 0.5
+ resist (mvrpds)/active		  1000 0.5
+ resist (rnps)/active	  	  1000 0.5
+ resist (rpps)/active	  	  1000 0.5
+ resist (rpp)/active		280000 0.5
+ resist (rnp)/active		250000 0.5
+#ifdef HRPOLY1K
+ resist (hires,mvhires)/active  800000 0.5
+#endif (HRPOLY1K)
+
+ resist (allm1)/metal1		    76
+ resist (allm2)/metal2		    76
+#ifdef METALS3
+#ifdef THICKMET3P0
+ resist (allm3)/metal3  	     6
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allm3)/metal3  	    31
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allm3)/metal3  	    50
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS3)
+#ifdef METALS4 || METALS5 || METALS6
+ resist (allm3)/metal3	            76
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4
+#ifdef THICKMET3P0
+ resist (allm4)/metal4  	     6
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allm4)/metal4  	    31
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allm4)/metal4  	    50
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS4)
+#ifdef METALS5 || METALS6
+ resist (allm4)/metal4  	    76
+#endif (METALS5 || METALS6)
+
+#ifdef METALS5
+#ifdef THICKMET3P0
+ resist (allm5)/metal5  	     6
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allm5)/metal5  	    31
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allm5)/metal5  	    50
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS5)
+#ifdef METALS6
+ resist (allm5)/metal5  	    76
+#endif (METALS6)
+
+#ifdef METALS6
+#ifdef THICKMET3P0
+ resist (allmtp)/metaltp  	     6
+#elseif THICKMET0P9 || THICKMET1P1
+ resist (allmtp)/metaltp  	    31
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+ resist (allmtp)/metaltp  	    50
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#endif (METALS6)
+
+ contact ndc,nsc,ndic,nndic	     0
+ contact pdc,psc,pdic		     0
+ contact mvndc,mvnsc,mvndic,mvnndic  0
+ contact mvpdc,mvpsc,mvpdic	     0
+ contact pc			     0
+ contact m2c			     0
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ contact m3c			     0
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+#ifdef METALS4 || METALS5 || METALS6
+ contact via3			     0
+#endif (METALS4 || METALS5 || METALS6)
+#ifdef METALS5 || METALS6
+ contact via4			     0
+#endif (METALS5 || METALS6)
+#ifdef MIM
+ contact mimcc			     0
+#endif (MIM)
+#ifdef METALS6
+ contact viatp			     0
+#endif (METALS6)
+
+variants *
+
+ # These types should not be considered as electrical nodes
+ resist comment			None
+
+#-------------------------------------------------------------------------
+# Parasitic capacitance values:
+#-------------------------------------------------------------------------
+# This uses the new "default" definitions that determine the intervening
+# planes from the planeorder stack, take care of the reflexive sideoverlap
+# definitions, and generally clean up the section and make it more readable.
+#
+# Also uses "units microns" statement, so all parasitic capacitance values
+# are taken directly from the source document PDS_035_03, in units of
+# aF/um^2 for area caps and aF/um for perimeter and sidewall caps.
+#-------------------------------------------------------------------------
+# Remember that device capacitances to substrate are taken care of by the
+# models.  Thus, active and poly definitions ignore all "fet" types.
+# fet types are excluded when computing parasitic capacitance to
+# active from layers above them because poly is a shield; fet types are
+# included for parasitics from layers above to poly.  Resistor types
+# should be removed from all parasitic capacitance calculations, or else
+# they just create floating caps.  Technically, the capacitance probably
+# should be split between the two terminals.  Unsure of the correct model.
+# Because rnw is on the well plane, "defaultareacap" does not work for
+# planes above diffusion because rnw cannot be removed from types on the
+# well plane.  Because of this, use the normal "areacap" to specify cap
+# to substrate, and "defaultoverlap" to specify cap to nwell (but not rnw). 
+#-------------------------------------------------------------------------
+
+variants ()
+# Nominal capacitances
+
+#n-well
+defaultareacap     nwell well 120
+
+#n-active 
+# Rely on device models to capture *ndiff area cap
+# Do not extract parasitics from resistors
+# defaultareacap     allnactivenonfet active 790
+# defaultperimeter   allnactivenonfet active 280
+
+#p-active
+# Rely on device models to capture *pdiff area cap
+# Do not extract parasitics from resistors
+# defaultareacap     allpactivenonfet active 810
+# defaultperimeter   allpactivenonfet active 300
+
+#poly
+# Do not extract parasitics from resistors
+# defaultsidewall    allpolynonfet active  22
+# defaultareacap     allpolynonfet active  105
+# defaultperimeter   allpolynonfet active   57
+
+ defaultsidewall    *poly active  11.156 -0.082
+ defaultareacap     *poly active  110.670
+ defaultperimeter   *poly active  50.695
+ defaultoverlap     *poly active nwell,obswell,pwell well  110.670
+ defaultsideoverlap *poly active nwell,obswell,pwell well  50.695
+
+#metal1
+ defaultsidewall    allm1 metal1  33.896 0.034
+ defaultareacap     allm1 metal1  29.304
+ defaultperimeter   allm1 metal1  40.002
+ defaultoverlap     allm1 metal1 nwell well 29.304
+ defaultsideoverlap allm1 metal1 nwell well 40.002
+#metal1->active
+ defaultoverlap     allm1 metal1 alllvactivenonfet active 39.502
+ defaultsideoverlap allm1 metal1 alllvactivenonfet active 43.384
+ defaultoverlap     allm1 metal1 allmvactivenonfet active 39.187
+ defaultsideoverlap allm1 metal1 allmvactivenonfet active 43.289
+
+#metal1->poly
+ defaultoverlap     allm1 metal1 allpolynonres active 51.434
+ defaultsideoverlap allm1 metal1 allpolynonres active 46.685
+ defaultsideoverlap *poly active allm1 metal1 17.958
+
+#metal2
+ defaultsidewall    allm2 metal2  45.790 0.116
+ defaultareacap     allm2 metal2  15.016
+ defaultperimeter   allm2 metal2  33.938
+ defaultoverlap     allm2 metal2 nwell well 15.016
+ defaultsideoverlap allm2 metal2 nwell well 33.938
+#metal2->active
+ defaultoverlap     allm2 metal2 alllvactivenonfet active 17.305
+ defaultsideoverlap allm2 metal2 alllvactivenonfet active 35.189
+ defaultoverlap     allm2 metal2 allmvactivenonfet active 17.244
+ defaultsideoverlap allm2 metal2 allmvactivenonfet active 35.157
+
+#metal2->poly
+ defaultoverlap     allm2 metal2 allpolynonres active 19.263
+ defaultsideoverlap allm2 metal2 allpolynonres active 36.179
+ defaultsideoverlap *poly active allm2 metal2 8.801
+
+#metal2->metal1
+ defaultoverlap     allm2 metal2 allm1 metal1 59.027
+ defaultsideoverlap allm2 metal2 allm1 metal1 49.021
+ defaultsideoverlap allm1 metal1 allm2 metal2 32.918
+
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+#metal3
+ defaultsidewall    allm3 metal3  54.507 0.188
+ defaultareacap     allm3 metal3  10.094
+ defaultperimeter   allm3 metal3  30.707
+ defaultoverlap     allm3 metal3 nwell well 10.094
+ defaultsideoverlap allm3 metal3 nwell well 30.707
+
+#metal3->active
+ defaultoverlap     allm3 metal3 alllvactivenonfet active 11.079
+ defaultsideoverlap allm3 metal3 alllvactivenonfet active 31.415
+ defaultoverlap     allm3 metal3 allmvactivenonfet active 11.054
+ defaultsideoverlap allm3 metal3 allmvactivenonfet active 31.398
+
+#metal3->poly
+ defaultoverlap     allm3 metal3 allpolynonres active 11.850
+ defaultsideoverlap allm3 metal3 allpolynonres active 31.943
+ defaultsideoverlap *poly active allm3 metal3 5.897
+
+#metal3->metal1
+ defaultoverlap     allm3 metal3 allm1 metal1 20.238
+ defaultsideoverlap allm3 metal3 allm1 metal1 36.619
+ defaultsideoverlap allm1 metal1 allm3 metal3 18.424
+
+#metal3->metal2
+ defaultoverlap     allm3 metal3 allm2 metal2 59.027
+ defaultsideoverlap allm3 metal3 allm2 metal2 49.006
+ defaultsideoverlap allm2 metal2 allm3 metal3 37.604
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4 || METALS5 || METALS6
+#metal4
+ defaultsidewall    allm4 metal4  61.684 0.250
+ defaultareacap     allm4 metal4  7.602
+ defaultperimeter   allm4 metal4  28.614
+ defaultoverlap     allm4 metal4 nwell well 7.602
+ defaultsideoverlap allm4 metal4 nwell well 28.614
+
+#metal4->active
+ defaultoverlap     allm4 metal4 alllvactivenonfet active 8.148
+ defaultsideoverlap allm4 metal4 alllvactivenonfet active 29.090
+ defaultoverlap     allm4 metal4 allmvactivenonfet active 8.135
+ defaultsideoverlap allm4 metal4 allmvactivenonfet active 29.079
+
+#metal4->poly
+ defaultoverlap     allm4 metal4 allpolynonres active 8.557
+ defaultsideoverlap allm4 metal4 allpolynonres active 29.435
+ defaultsideoverlap *poly active allm4 metal4 4.443
+
+#metal4->metal1
+ defaultoverlap     allm4 metal4 allm1 metal1 12.212
+ defaultsideoverlap allm4 metal4 allm1 metal1 32.121
+ defaultsideoverlap allm1 metal1 allm4 metal4 13.241
+
+#metal4->metal2
+ defaultoverlap     allm4 metal4 allm2 metal2 20.238
+ defaultsideoverlap allm4 metal4 allm2 metal2 36.571
+ defaultsideoverlap allm2 metal2 allm4 metal4 22.562
+
+#metal4->metal3
+ defaultoverlap     allm4 metal4 allm3 metal3 59.027
+ defaultsideoverlap allm4 metal4 allm3 metal3 48.976
+ defaultsideoverlap allm3 metal3 allm4 metal4 40.114
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS5
+#metal5
+ defaultsidewall    allm5 metal5       99.669 0.250
+#endif
+#ifdef METALS6
+ defaultsidewall    allm5 metal5       31.121
+#endif
+
+#ifdef METALS5 || METALS6
+ defaultareacap     allm5 metal5  5.798
+ defaultperimeter   allm5 metal5  30.791
+ defaultoverlap     allm5 metal5 nwell well 5.798
+ defaultsideoverlap allm5 metal5 nwell well 30.791
+
+#metal5->active
+ defaultoverlap     allm5 metal5 alllvactivenonfet active 6.110
+ defaultsideoverlap allm5 metal5 alllvactivenonfet active 31.213
+ defaultoverlap     allm5 metal5 allmvactivenonfet active 6.102
+ defaultsideoverlap allm5 metal5 allmvactivenonfet active 31.203
+
+#metal5->poly
+ defaultoverlap     allm5 metal5 allpolynonres active 6.337
+ defaultsideoverlap allm5 metal5 allpolynonres active 31.513
+ defaultsideoverlap *poly active allm5 metal5 3.393
+
+#metal5->metal1
+ defaultoverlap     allm5 metal5 allm1 metal1 8.142
+ defaultsideoverlap allm5 metal5 allm1 metal1 33.682
+ defaultsideoverlap allm1 metal1 allm5 metal5 9.878
+
+#metal5->metal2
+ defaultoverlap     allm5 metal5 allm2 metal2 11.067
+ defaultsideoverlap allm5 metal5 allm2 metal2 36.632
+ defaultsideoverlap allm2 metal2 allm5 metal5 15.854
+
+#metal5->metal3
+ defaultoverlap     allm5 metal5 allm3 metal3 17.276
+ defaultsideoverlap allm5 metal5 allm3 metal3 41.531
+ defaultsideoverlap allm3 metal3 allm5 metal5 23.133
+
+#metal5->metal4
+ defaultoverlap     allm5 metal5 allm4 metal4 39.351
+ defaultsideoverlap allm5 metal5 allm4 metal4 52.667
+ defaultsideoverlap allm4 metal4 allm5 metal5 35.678
+#endif (METALS5 || METALS6)
+
+#ifdef METALS6
+#metaltp
+ defaultsidewall    allmtp metaltp  54.335
+ defaultareacap     allmtp metaltp  4.8793
+ defaultperimeter   allmtp metaltp  9.5950
+ defaultoverlap     allmtp metaltp nwell well 4.8793
+ defaultsideoverlap allmtp metaltp nwell well 9.5950
+
+#metaltp->active
+ defaultoverlap     allmtp metaltp alllvactivenonfet active 5.0937
+ defaultsideoverlap allmtp metaltp alllvactivenonfet active 9.8790
+ defaultoverlap     allmtp metaltp allmvactivenonfet active 5.0937
+ defaultsideoverlap allmtp metaltp allmvactivenonfet active 9.8790
+
+#metaltp->poly
+ defaultoverlap     allmtp metaltp allpolynonres active 5.2558
+ defaultsideoverlap allmtp metaltp allpolynonres active 10.128
+ defaultsideoverlap *poly active allmtp metaltp 16.946
+
+#metaltp->metal1
+ defaultoverlap     allmtp metaltp allm1 metal1 6.4394
+ defaultsideoverlap allmtp metaltp allm1 metal1 11.765
+ defaultsideoverlap allm1 metal1 allmtp metaltp XX.XX
+
+#metaltp->metal2
+ defaultoverlap     allmtp metaltp allm2 metal2 8.1418
+ defaultsideoverlap allmtp metaltp allm2 metal2 13.958
+ defaultsideoverlap allm2 metal2 allmtp metaltp XX.XX
+
+#metaltp->metal3
+ defaultoverlap     allmtp metaltp allm3 metal3 11.0677
+ defaultsideoverlap allmtp metaltp allm3 metal3 17.640
+ defaultsideoverlap allm3 metal3 allmtp metaltp XX.XX
+
+#metaltp->metal4
+ defaultoverlap     allmtp metaltp allm4 metal4 17.2765
+ defaultsideoverlap allmtp metaltp allm4 metal4 24.286
+ defaultsideoverlap allm4 metal4 allmtp metaltp XX.XX
+
+#metaltp->metal5
+ defaultoverlap     allmtp metaltp allm5 metal5 39.3519
+ defaultsideoverlap allmtp metaltp allm5 metal5 39.586
+ defaultsideoverlap allm5 metal5 allmtp metaltp XX.XX
+#endif (METALS6)
+
+#-------------------------------------------------------------------------
+# Parasitic capacitance values for maximum corner
+#-------------------------------------------------------------------------
+
+variants (hrhc),(lrhc)
+# Maximum corner capacitances
+
+#n-well
+defaultareacap     nwell well 120
+
+#n-active 
+# Rely on device models to capture *ndiff area cap
+# Do not extract parasitics from resistors
+# defaultareacap     allnactivenonfet active 790
+# defaultperimeter   allnactivenonfet active 280
+
+#p-active
+# Rely on device models to capture *pdiff area cap
+# Do not extract parasitics from resistors
+# defaultareacap     allpactivenonfet active 810
+# defaultperimeter   allpactivenonfet active 300
+
+#poly
+# Do not extract parasitics from resistors
+# defaultsidewall    allpolynonfet active  22
+# defaultareacap     allpolynonfet active  105
+# defaultperimeter   allpolynonfet active   57
+
+ defaultsidewall    *poly active  10.455 -0.090
+ defaultareacap     *poly active  130.210
+ defaultperimeter   *poly active  53.506
+ defaultoverlap     *poly active nwell,obswell,pwell well  130.210
+ defaultsideoverlap *poly active nwell,obswell,pwell well  53.506
+
+#metal1
+ defaultsidewall    allm1 metal1  34.059 0.021
+ defaultareacap     allm1 metal1  33.126
+ defaultperimeter   allm1 metal1  42.144
+ defaultoverlap     allm1 metal1 nwell well 33.126
+ defaultsideoverlap allm1 metal1 nwell well 42.144
+#metal1->active
+ defaultoverlap     allm1 metal1 alllvactivenonfet active 43.987
+ defaultsideoverlap allm1 metal1 alllvactivenonfet active 45.576
+ defaultoverlap     allm1 metal1 allmvactivenonfet active 43.597
+ defaultsideoverlap allm1 metal1 allmvactivenonfet active 45.461
+
+#metal1->poly
+ defaultoverlap     allm1 metal1 allpolynonres active 60.319
+ defaultsideoverlap allm1 metal1 allpolynonres active 49.798
+ defaultsideoverlap *poly active allm1 metal1 19.221
+
+#metal2
+ defaultsidewall    allm2 metal2  45.828 0.096
+ defaultareacap     allm2 metal2  16.471
+ defaultperimeter   allm2 metal2  35.327
+ defaultoverlap     allm2 metal2 nwell well 16.471
+ defaultsideoverlap allm2 metal2 nwell well 35.327
+#metal2->active
+ defaultoverlap     allm2 metal2 alllvactivenonfet active 18.777
+ defaultsideoverlap allm2 metal2 alllvactivenonfet active 36.551
+ defaultoverlap     allm2 metal2 allmvactivenonfet active 18.706
+ defaultsideoverlap allm2 metal2 allmvactivenonfet active 36.515
+
+#metal2->poly
+ defaultoverlap     allm2 metal2 allpolynonres active 21.231
+ defaultsideoverlap allm2 metal2 allpolynonres active 37.755
+ defaultsideoverlap *poly active allm2 metal2 9.086
+
+#metal2->metal1
+ defaultoverlap     allm2 metal2 allm1 metal1 73.630
+ defaultsideoverlap allm2 metal2 allm1 metal1 53.167
+ defaultsideoverlap allm1 metal1 allm2 metal2 36.404
+
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+#metal3
+ defaultsidewall    allm3 metal3  54.477 0.163
+ defaultareacap     allm3 metal3  10.961
+ defaultperimeter   allm3 metal3  31.819
+ defaultoverlap     allm3 metal3 nwell well 10.961
+ defaultsideoverlap allm3 metal3 nwell well 31.819
+
+#metal3->active
+ defaultoverlap     allm3 metal3 alllvactivenonfet active 11.936
+ defaultsideoverlap allm3 metal3 alllvactivenonfet active 32.504
+ defaultoverlap     allm3 metal3 allmvactivenonfet active 11.907
+ defaultsideoverlap allm3 metal3 allmvactivenonfet active 32.485
+
+#metal3->poly
+ defaultoverlap     allm3 metal3 allpolynonres active 12.883
+ defaultsideoverlap allm3 metal3 allpolynonres active 33.136
+ defaultsideoverlap *poly active allm3 metal3 6.028
+
+#metal3->metal1
+ defaultoverlap     allm3 metal3 allm1 metal1 22.673
+ defaultsideoverlap allm3 metal3 allm1 metal1 38.397
+ defaultsideoverlap allm1 metal1 allm3 metal3 19.554
+
+#metal3->metal2
+ defaultoverlap     allm3 metal3 allm2 metal2 73.630
+ defaultsideoverlap allm3 metal3 allm2 metal2 53.157
+ defaultsideoverlap allm2 metal2 allm3 metal3 41.317
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4 || METALS5 || METALS6
+#metal4
+ defaultsidewall    allm4 metal4  61.563 0.220
+ defaultareacap     allm4 metal4  8.213
+ defaultperimeter   allm4 metal4  29.587
+ defaultoverlap     allm4 metal4 nwell well 8.213
+ defaultsideoverlap allm4 metal4 nwell well 29.587
+
+#metal4->active
+ defaultoverlap     allm4 metal4 alllvactivenonfet active 8.749
+ defaultsideoverlap allm4 metal4 alllvactivenonfet active 30.045
+ defaultoverlap     allm4 metal4 allmvactivenonfet active 8.733
+ defaultsideoverlap allm4 metal4 allmvactivenonfet active 30.032
+
+#metal4->poly
+ defaultoverlap     allm4 metal4 allpolynonres active 9.247
+ defaultsideoverlap allm4 metal4 allpolynonres active 30.454
+ defaultsideoverlap *poly active allm4 metal4 4.520
+
+#metal4->metal1
+ defaultoverlap     allm4 metal4 allm1 metal1 13.400
+ defaultsideoverlap allm4 metal4 allm1 metal1 33.421
+ defaultsideoverlap allm1 metal1 allm4 metal4 13.914
+
+#metal4->metal2
+ defaultoverlap     allm4 metal4 allm2 metal2 22.673
+ defaultsideoverlap allm4 metal4 allm2 metal2 38.361
+ defaultsideoverlap allm2 metal2 allm4 metal4 23.857
+
+#metal4->metal3
+ defaultoverlap     allm4 metal4 allm3 metal3 73.630
+ defaultsideoverlap allm4 metal4 allm3 metal3 53.137
+ defaultsideoverlap allm3 metal3 allm4 metal4 43.947
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS5 || METALS6
+#metal5
+ defaultsidewall    allm5 metal5  104.126 0.213
+ defaultareacap     allm5 metal5  6.240
+ defaultperimeter   allm5 metal5  32.324
+ defaultoverlap     allm5 metal5 nwell well 6.240
+ defaultsideoverlap allm5 metal5 nwell well 32.324
+
+#metal5->active
+ defaultoverlap     allm5 metal5 alllvactivenonfet active 6.545
+ defaultsideoverlap allm5 metal5 alllvactivenonfet active 32.737
+ defaultoverlap     allm5 metal5 allmvactivenonfet active 6.536
+ defaultsideoverlap allm5 metal5 allmvactivenonfet active 32.725
+
+#metal5->poly
+ defaultoverlap     allm5 metal5 allpolynonres active 6.820
+ defaultsideoverlap allm5 metal5 allpolynonres active 33.100
+ defaultsideoverlap *poly active allm5 metal5 3.439
+
+#metal5->metal1
+ defaultoverlap     allm5 metal5 allm1 metal1 8.841
+ defaultsideoverlap allm5 metal5 allm1 metal1 35.526
+ defaultsideoverlap allm1 metal1 allm5 metal5 10.324
+
+#metal5->metal2
+ defaultoverlap     allm5 metal5 allm2 metal2 12.108
+ defaultsideoverlap allm5 metal5 allm2 metal2 38.793
+ defaultsideoverlap allm2 metal2 allm5 metal5 16.584
+
+#metal5->metal3
+ defaultoverlap     allm5 metal5 allm3 metal3 19.206
+ defaultsideoverlap allm5 metal5 allm3 metal3 44.284
+ defaultsideoverlap allm3 metal3 allm5 metal5 24.338
+
+#metal5->metal4
+ defaultoverlap     allm5 metal5 allm4 metal4 46.417
+ defaultsideoverlap allm5 metal5 allm4 metal4 57.180
+ defaultsideoverlap allm4 metal4 allm5 metal5 38.327
+#endif (METALS5 || METALS6)
+
+#ifdef METALS6
+#metaltp
+ defaultsidewall    allmtp metaltp  57.187
+ defaultareacap     allmtp metaltp  5.242
+ defaultperimeter   allmtp metaltp  9.407
+ defaultoverlap     allmtp metaltp nwell well 5.242
+
+#metaltp->active
+ defaultoverlap     allmtp metaltp alllvactivenonfet active 5.450
+ defaultsideoverlap allmtp metaltp alllvactivenonfet active 9.679
+ defaultoverlap     allmtp metaltp allmvactivenonfet active 5.450
+ defaultsideoverlap allmtp metaltp allmvactivenonfet active 9.679
+
+#metaltp->poly
+ defaultoverlap     allmtp metaltp allpolynonres active 5.645
+ defaultsideoverlap allmtp metaltp allpolynonres active 9.925
+ defaultsideoverlap *poly active allmtp metaltp 16.946
+
+#metaltp->metal1
+ defaultoverlap     allmtp metaltp allm1 metal1 6.962
+ defaultsideoverlap allmtp metaltp allm1 metal1 11.549
+ defaultsideoverlap allm1 metal1 allmtp metaltp 16.946
+
+#metaltp->metal2
+ defaultoverlap     allmtp metaltp allm2 metal2 8.841
+ defaultsideoverlap allmtp metaltp allm2 metal2 13.909
+ defaultsideoverlap allm2 metal2 allmtp metaltp 16.946
+
+#metaltp->metal3
+ defaultoverlap     allmtp metaltp allm3 metal3 12.211
+ defaultsideoverlap allmtp metaltp allm3 metal3 17.215
+ defaultsideoverlap allm3 metal3 allmtp metaltp 16.946
+
+#metaltp->metal4
+ defaultoverlap     allmtp metaltp allm4 metal4 19.207
+ defaultsideoverlap allmtp metaltp allm4 metal4 24.725
+ defaultsideoverlap allm4 metal4 allmtp metaltp 16.946
+
+#metaltp->metal5
+ defaultoverlap     allmtp metaltp allm5 metal5 46.418
+ defaultsideoverlap allmtp metaltp allm5 metal5 41.628
+ defaultsideoverlap allm5 metal5 allmtp metaltp 16.946
+#endif (METALS6)
+
+#-------------------------------------------------------------------------
+# Parasitic capacitance values for minimum corner
+#-------------------------------------------------------------------------
+
+variants (hrlc),(lrlc)
+# Minimum corner capacitances
+
+#n-well
+defaultareacap     nwell well 120
+
+#n-active 
+# Rely on device models to capture *ndiff area cap
+# Do not extract parasitics from resistors
+# defaultareacap     allnactivenonfet active 790
+# defaultperimeter   allnactivenonfet active 280
+
+#p-active
+# Rely on device models to capture *pdiff area cap
+# Do not extract parasitics from resistors
+# defaultareacap     allpactivenonfet active 810
+# defaultperimeter   allpactivenonfet active 300
+
+#poly
+# Do not extract parasitics from resistors
+# defaultsidewall    allpolynonfet active  22
+# defaultareacap     allpolynonfet active  105
+# defaultperimeter   allpolynonfet active   57
+
+ defaultsidewall    *poly active  11.799 -0.074
+ defaultareacap     *poly active  96.239
+ defaultperimeter   *poly active  48.373
+ defaultoverlap     *poly active nwell,obswell,pwell well  96.239
+ defaultsideoverlap *poly active nwell,obswell,pwell well  48.373
+
+#metal1
+ defaultsidewall    allm1 metal1  33.603 0.047
+ defaultareacap     allm1 metal1  26.273
+ defaultperimeter   allm1 metal1  38.089
+ defaultoverlap     allm1 metal1 nwell well 26.273
+ defaultsideoverlap allm1 metal1 nwell well 38.089
+
+#metal1->active
+ defaultoverlap     allm1 metal1 alllvactivenonfet active 35.846
+ defaultsideoverlap allm1 metal1 alllvactivenonfet active 41.384
+ defaultoverlap     allm1 metal1 allmvactivenonfet active 35.587
+ defaultsideoverlap allm1 metal1 allmvactivenonfet active 41.302
+
+#metal1->poly
+ defaultoverlap     allm1 metal1 allpolynonres active 44.830
+ defaultsideoverlap allm1 metal1 allpolynonres active 43.999
+ defaultsideoverlap *poly active allm1 metal1 16.943
+
+#metal2
+ defaultsidewall    allm2 metal2  45.641 0.137
+ defaultareacap     allm2 metal2  13.797
+ defaultperimeter   allm2 metal2  32.657
+ defaultoverlap     allm2 metal2 nwell well 13.797
+#metal2->active
+ defaultoverlap     allm2 metal2 alllvactivenonfet active 16.047
+ defaultsideoverlap allm2 metal2 alllvactivenonfet active 33.914
+ defaultoverlap     allm2 metal2 allmvactivenonfet active 15.995
+ defaultsideoverlap allm2 metal2 allmvactivenonfet active 33.886
+
+#metal2->poly
+ defaultoverlap     allm2 metal2 allpolynonres active 17.629
+ defaultsideoverlap allm2 metal2 allpolynonres active 34.732
+ defaultsideoverlap *poly active allm2 metal2 8.547
+
+#metal2->metal1
+ defaultoverlap     allm2 metal2 allm1 metal1 49.257
+ defaultsideoverlap allm2 metal2 allm1 metal1 45.664
+ defaultsideoverlap allm1 metal1 allm2 metal2 30.171
+
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+#metal3
+ defaultsidewall    allm3 metal3  54.440 0.215
+ defaultareacap     allm3 metal3  9.354
+ defaultperimeter   allm3 metal3  29.662
+ defaultoverlap     allm3 metal3 nwell well 9.354
+ defaultsideoverlap allm3 metal3 nwell well 29.662
+
+#metal3->active
+ defaultoverlap     allm3 metal3 alllvactivenonfet active 10.337
+ defaultsideoverlap allm3 metal3 alllvactivenonfet active 30.382
+ defaultoverlap     allm3 metal3 allmvactivenonfet active 10.316
+ defaultsideoverlap allm3 metal3 allmvactivenonfet active 30.366
+
+#metal3->poly
+ defaultoverlap     allm3 metal3 allpolynonres active 10.971
+ defaultsideoverlap allm3 metal3 allpolynonres active 30.823
+ defaultsideoverlap *poly active allm3 metal3 5.776
+
+#metal3->metal1
+ defaultoverlap     allm3 metal3 allm1 metal1 18.275
+ defaultsideoverlap allm3 metal3 allm1 metal1 35.016
+ defaultsideoverlap allm1 metal1 allm3 metal3 17.429
+
+#metal3->metal2
+ defaultoverlap     allm3 metal3 allm2 metal2 49.257
+ defaultsideoverlap allm3 metal3 allm2 metal2 45.644
+ defaultsideoverlap allm2 metal2 allm3 metal3 34.658
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4 || METALS5 || METALS6
+#metal4
+ defaultsidewall    allm4 metal4  61.705 0.282
+ defaultareacap     allm4 metal4  7.076
+ defaultperimeter   allm4 metal4  27.689
+ defaultoverlap     allm4 metal4 nwell well 7.076
+ defaultsideoverlap allm4 metal4 nwell well 27.689
+
+#metal4->active
+ defaultoverlap     allm4 metal4 alllvactivenonfet active 7.625
+ defaultsideoverlap allm4 metal4 alllvactivenonfet active 28.177
+ defaultoverlap     allm4 metal4 allmvactivenonfet active 7.613
+ defaultsideoverlap allm4 metal4 allmvactivenonfet active 28.166
+
+#metal4->poly
+ defaultoverlap     allm4 metal4 allpolynonres active 7.964
+ defaultsideoverlap allm4 metal4 allpolynonres active 28.467
+ defaultsideoverlap *poly active allm4 metal4 4.370
+
+#metal4->metal1
+ defaultoverlap     allm4 metal4 allm1 metal1 11.218
+ defaultsideoverlap allm4 metal4 allm1 metal1 30.915
+ defaultsideoverlap allm1 metal1 allm4 metal4 12.630
+
+#metal4->metal2
+ defaultoverlap     allm4 metal4 allm2 metal2 18.275
+ defaultsideoverlap allm4 metal4 allm2 metal2 34.956
+ defaultsideoverlap allm2 metal2 allm4 metal4 21.420
+
+#metal4->metal3
+ defaultoverlap     allm4 metal4 allm3 metal3 49.257
+ defaultsideoverlap allm4 metal4 allm3 metal3 45.614
+ defaultsideoverlap allm3 metal3 allm4 metal4 37.061
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS5 || METALS6
+#metal5
+ defaultsidewall    allm5 metal5  99.225 0.274
+ defaultareacap     allm5 metal5  5.414
+ defaultperimeter   allm5 metal5  29.818
+ defaultoverlap     allm5 metal5 nwell well 5.414
+ defaultsideoverlap allm5 metal5 nwell well 29.818
+
+#metal5->active
+ defaultoverlap     allm5 metal5 alllvactivenonfet active 5.729
+ defaultsideoverlap allm5 metal5 alllvactivenonfet active 30.253
+ defaultoverlap     allm5 metal5 allmvactivenonfet active 5.722
+ defaultsideoverlap allm5 metal5 allmvactivenonfet active 30.245
+
+#metal5->poly
+ defaultoverlap     allm5 metal5 allpolynonres active 5.918
+ defaultsideoverlap allm5 metal5 allpolynonres active 30.508
+ defaultsideoverlap *poly active allm5 metal5 3.347
+
+#metal5->metal1
+ defaultoverlap     allm5 metal5 allm1 metal1 7.545
+ defaultsideoverlap allm5 metal5 allm1 metal1 32.514
+ defaultsideoverlap allm1 metal1 allm5 metal5 9.467
+
+#metal5->metal2
+ defaultoverlap     allm5 metal5 allm2 metal2 10.192
+ defaultsideoverlap allm5 metal5 allm2 metal2 35.267
+ defaultsideoverlap allm2 metal2 allm5 metal5 15.189
+
+#metal5->metal3
+ defaultoverlap     allm5 metal5 allm3 metal3 15.699
+ defaultsideoverlap allm5 metal5 allm3 metal3 39.792
+ defaultsideoverlap allm3 metal3 allm5 metal5 22.057
+
+#metal5->metal4
+ defaultoverlap     allm5 metal5 allm4 metal4 34.152
+ defaultsideoverlap allm5 metal5 allm4 metal4 49.778
+ defaultsideoverlap allm4 metal4 allm5 metal5 33.450
+#endif (METALS5 || METALS6)
+
+#ifdef METALS6
+#metaltp
+ defaultsidewall    allmtp metaltp  51.353
+ defaultareacap     allmtp metaltp  4.563
+ defaultperimeter   allmtp metaltp  9.764
+ defaultoverlap     allmtp metaltp nwell well 4.563
+ defaultsideoverlap allmtp metaltp nwell well 9.764
+
+#metaltp->active
+ defaultoverlap     allmtp metaltp alllvactivenonfet active 4.781
+ defaultsideoverlap allmtp metaltp alllvactivenonfet active 10.070
+ defaultoverlap     allmtp metaltp allmvactivenonfet active 4.781
+ defaultsideoverlap allmtp metaltp allmvactivenonfet active 10.070
+
+#metaltp->poly
+ defaultoverlap     allmtp metaltp allpolynonres active 4.917
+ defaultsideoverlap allmtp metaltp allpolynonres active 10.263
+ defaultsideoverlap *poly active allmtp metaltp 16.946
+
+#metaltp->metal1
+ defaultoverlap     allmtp metaltp allm1 metal1 5.990
+ defaultsideoverlap allmtp metaltp allm1 metal1 11.858
+ defaultsideoverlap allm1 metal1 allmtp metaltp 16.946
+
+#metaltp->metal2
+ defaultoverlap     allmtp metaltp allm2 metal2 7.545
+ defaultsideoverlap allmtp metaltp allm2 metal2 13.985
+ defaultsideoverlap allm2 metal2 allmtp metaltp 16.946
+
+#metaltp->metal3
+ defaultoverlap     allmtp metaltp allm3 metal3 10.192
+ defaultsideoverlap allmtp metaltp allm3 metal3 17.610
+ defaultsideoverlap allm3 metal3 allmtp metaltp 16.946
+
+#metaltp->metal4
+ defaultoverlap     allmtp metaltp allm4 metal4 15.699
+ defaultsideoverlap allmtp metaltp allm4 metal4 23.834
+ defaultsideoverlap allm4 metal4 allmtp metaltp 16.946
+
+#metaltp->metal5
+ defaultoverlap     allmtp metaltp allm5 metal5 34.153
+ defaultsideoverlap allmtp metaltp allm5 metal5 37.782
+ defaultsideoverlap allm5 metal5 allmtp metaltp 16.946
+#endif (METALS6)
+
+#-------------------------------------------------------------------------
+
+variants *
+
+# Devices:
+# All devices except diodes are modeled as subcircuits
+
+# device list:
+#  nfet_03v3		mosfet
+#  pfet_03v3		mosfet
+#  nfet_06v0		mosfet (thick oxide)
+#  pfet_06v0		mosfet (thick oxide)
+#  nfet_05v0		mosfet (thick oxide, short gate)*
+#  pfet_05v0		mosfet (thick oxide, short gate)*
+#  nfet_06v0_nvt	mosfet (native Vt)
+#  nfet_03v3_dss	mosfet (unsalicided drain)
+#  pfet_03v3_dss	mosfet (unsalicided drain)
+#  nfet_06v0_dss	mosfet (unsalicided drain, thick oxide)
+#  pfet_06v0_dss	mosfet (unsalicided drain, thick oxide)
+#  nfet_10v0_asym	LDNMOS (extended drain)
+#  pfet_10v0_asym	LDPMOS (extended drain)
+#
+#  diode_nd2ps_03v3	diode  (N+/pwell)
+#  diode_pd2nw_03v3	diode  (P+/nwell)
+#  diode_nd2ps_06v0	diode  (N+/pwell, high voltage)
+#  diode_pd2nw_06v0	diode  (P+/nwell, high voltage)
+#  diode_nw2pw_03v3	diode  (nwell/pwell)
+#  diode_nw2pw_06v0	diode  (nwell/pwell, high voltage)
+#  diode_dnw2pw		diode  (pwell/dnwell)
+#  diode_dnw2ps		diode  (dnwll/substrate)
+#  sc_diode		diode  (Schottky)
+#
+#  pnp_WxL		BJT    (10x10, 5x5, 0.42x10, 0.42x5 emitter sizes)
+#  npn_WxL		BJT    (10x10, 5x5, 0.54x16, 0.54x8, 0.54x4, 0.54x2)
+#
+#  npolyf_u		resistor (N+ poly, unsalicided)
+#  ppolyf_u		resistor (P+ poly, unsalicided)
+#  ppolyf_u_1k		resistor (high res resistor)*
+#  ppolyf_u_1k_6p0	resistor (high res resistor, high voltage)**
+#  nplus_u		resistor (N+ diffusion, unsalicided)
+#  pplus_u		resistor (P+ diffusion, unsalicided)
+#  npolyf_s		resistor (N+ poly, salicided)
+#  ppolyf_s		resistor (P+ poly, salicided)
+#  nplus_s		resistor (N+ diffusion, salicided)
+#  pplus_s		resistor (N+ diffusion, salicided)
+#  nwell		resistor (N-well resistor)
+#  rm1			resistor (metal1)
+#  rm2			resistor (metal2)
+#  rm3			resistor (metal3)
+#  rm4			resistor (metal4)
+#  rm5			resistor (metal5)
+#  tm6k			resistor (top metal, 0.6um thick (standard))***
+#  tm9k			resistor (top metal, 0.9um thick)
+#  tm11k		resistor (top metal, 1.1um thick)
+#  tm30k		resistor (top metal, 3.0um thick)
+#
+#  cap_nmos_03v3	mosfet	 (source-drain tied)
+#  cap_pmos_03v3	mosfet	 (source-drain tied)
+#  cap_nmos_06v0	mosfet	 (source-drain tied, high voltage)
+#  cap_pmos_06v0	mosfet	 (source-drain tied, high voltage)
+#  cap_nmos_03v3_b	mosfet   (n-varactor)
+#  cap_pmos_03v3_b	mosfet   (p-varactor)
+#  cap_nmos_06v0_b	mosfet   (n-varactor, high voltage)
+#  cap_pmos_06v0_b	mosfet   (p-varactor, high voltage)
+#
+#  cap_mim_2f0fF	capacitor (MiM)**,***
+#
+#  efuse		fuse
+
+# *Note that the "5V" and "6V" devices are the same device and have the same
+#  device model.  However, a slightly shorter gate length is allowed when
+#  operating at 5V.  The GF standard cell sets use the 5V length.  Magic
+#  will extract the shortest gate length as a "5V" type and everything else
+#  as "6V", which should allow for clean LVS when using the standard cells.
+#
+# **Note that there are multiple mutually exclusive process options for the
+#  high sheet rho resistor and MiM capacitor.  This tech file assumes the
+#  options 1kOhm/sq for the resistor and 2fF/um for the MiM capacitor.
+#
+# ***The top metal may be any of metal3 to metaltp, depending on the stackup
+
+ device msubcircuit pfet_03v3 pfet pdiff,pdc pdiff,pdc allnwell error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit nfet_03v3 nfet ndiff,ndc ndiff,ndc allpsub error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit pfet_03v3 srampfet srampdiff,srampdc srampdiff,srampdc \
+	allnwell error l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit nfet_03v3 sramnfet sramndiff,sramndc sramndiff,sramndc \
+	allpsub error l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit pfet_05v0 srammvpfet srammvpdiff,srammvpdc \
+	srammvpdiff,srammvpdc allnwell error l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit pfet_06v0 hvpfet mvpdiff,mvpdc mvpdiff,mvpdc allnwell error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit pfet_05v0 mvpfet mvpdiff,mvpdc mvpdiff,mvpdc allnwell error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit nfet_05v0 srammvnfet srammvndiff,srammvndc \
+	srammvndiff,srammvndc allpsub error l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit nfet_05v0 srammvnfet srammvndiff,srammvndc \
+	srammvndiff,srammvndc allpsub error l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit nfet_06v0 hvnfet mvndiff,mvndc mvndiff,mvndc allpsub error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit nfet_05v0 mvnfet mvndiff,mvndc mvndiff,mvndc allpsub error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit pfet_03v3_dss pfet pdiffres pdiffres allnwell error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd l1=s_sab l2=d_sab
+ device msubcircuit nfet_03v3_dss nfet ndiffres ndiffres allpsub error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd l1=s_sab l2=d_sab
+ device msubcircuit pfet_06v0_dss hvpfet,mvpfet mvpdiffres mvpdiffres allnwell error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd l1=s_sab l2=d_sab
+ device msubcircuit nfet_06v0_dss hvnfet,mvnfet mvndiffres mvndiffres allpsub error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd l1=s_sab l2=d_sab
+ device msubcircuit nfet_06v0_nvt mvnnfet mvndiff,mvndiffres,mvndc \
+	mvndiff,mvndiffres,mvndc allpsub error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd
+ device subcircuit cap_nmos_03v3_b nvaractor *nndiff l=c_length w=c_width
+ device subcircuit cap_nmos_06v0_b mvnvaractor *mvnndiff l=c_length w=c_width
+ device subcircuit cap_pmos_03v3_b pvaractor *ppdiff l=c_length w=c_width
+ device subcircuit cap_pmos_06v0_b mvpvaractor *mvppdiff l=c_length w=c_width
+ device subcircuit cap_pmos_03v3 pcap pdiff,pdc l=c_length w=c_width
+ device subcircuit cap_nmos_03v3 ncap ndiff,ndc l=c_length w=c_width
+ device subcircuit cap_pmos_06v0 mvpcap mvpdiff,mvpdc l=c_length w=c_width
+ device subcircuit cap_nmos_06v0 mvncap mvndiff,mvndc l=c_length w=c_width
+
+ device msubcircuit npn_10p00x10p00 npn *ndiff dnwell space/w error a1>99.0 a1<101.0
+ device msubcircuit npn_05p00x05p00 npn *ndiff dnwell space/w error a1>24.0 a1<26.0
+ device msubcircuit npn_00p54x16p00 npn *ndiff dnwell space/w error a1>8.5 a1<8.7
+ device msubcircuit npn_00p54x08p00 npn *ndiff dnwell space/w error a1>4.2 a1<4.4
+ device msubcircuit npn_00p54x04p00 npn *ndiff dnwell space/w error a1>2.0 a1<2.2
+ device msubcircuit npn_00p54x02p00 npn *ndiff dnwell space/w error a1>1.0 a1<1.2
+
+ device msubcircuit pnp_10p00x00p42 pnp *pdiff pwell,space/w a1>4.1 a1<4.3
+ device msubcircuit pnp_05p00x00p42 pnp *pdiff pwell,space/w a1>2.0 a1<2.2
+ device msubcircuit pnp_10p00x10p00 pnp *pdiff pwell,space/w a1>99.0 a1<101.0
+ device msubcircuit pnp_05p00x05p00 pnp *pdiff pwell,space/w a1>24.0 a1<26.0
+
+ device msubcircuit nfet_10v0_asym mvnfet *mvndiff *ldndiff allpsub error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd
+ device msubcircuit pfet_10v0_asym mvpfet *mvpdiff *ldpdiff allnwell error \
+	l=l w=w a1=as p1=ps a2=ad p2=pd
+
+ device rsubcircuit efuse efuse *poly
+
+ device rsubcircuit rm1 rm1 *m1 l=r_length w=r_width
+ device rsubcircuit rm2 rm2 *m2 l=r_length w=r_width
+#ifdef METALS4 || METALS5 || METALS6
+ device rsubcircuit rm3 rm3 *m3 l=r_length w=r_width
+#endif (METALS4 || METALS5 || METALS6)
+#ifdef METALS5 || METALS6
+ device rsubcircuit rm4 rm4 *m4 l=r_length w=r_width
+#endif (METALS5 || METALS6)
+#ifdef METALS6
+ device rsubcircuit rm5 rm5 *m5 l=r_length w=r_width
+#endif (METALS6)
+
+#ifdef THICKMET3P0
+#ifdef METALS3
+ device rsubcircuit tm30k rm3 *m3 l=r_length w=r_width
+#elseif defined (METALS4)
+ device rsubcircuit tm30k rm4 *m4 l=r_length w=r_width
+#elseif defined (METALS5)
+ device rsubcircuit tm30k rm5 *m5 l=r_length w=r_width
+#elseif defined (METALS6)
+ device rsubcircuit tm30k rmtp *mtp l=r_length w=r_width
+#endif
+#elseif defined (THICKMET1P1)
+#ifdef METALS3
+ device rsubcircuit tm11k rm3 *m3 l=r_length w=r_width
+#elseif defined (METALS4)
+ device rsubcircuit tm11k rm4 *m4 l=r_length w=r_width
+#elseif defined (METALS5)
+ device rsubcircuit tm11k rm5 *m5 l=r_length w=r_width
+#elseif defined (METALS6)
+ device rsubcircuit tm11k rmtp *mtp l=r_length w=r_width
+#endif
+#elseif defined (THICKMET0P9)
+#ifdef METALS3
+ device rsubcircuit tm9k  rm3 *m3 l=r_length w=r_width
+#elseif defined (METALS4)
+ device rsubcircuit tm9k  rm4 *m4 l=r_length w=r_width
+#elseif defined (METALS5)
+ device rsubcircuit tm9k  rm5 *m5 l=r_length w=r_width
+#elseif defined (METALS6)
+ device rsubcircuit tm9k  rmtp *mtp l=r_length w=r_width
+#endif
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+#ifdef METALS3
+ device rsubcircuit tm6k  rm3 *m3 l=r_length w=r_width
+#elseif defined (METALS4)
+ device rsubcircuit tm6k  rm4 *m4 l=r_length w=r_width
+#elseif defined (METALS5)
+ device rsubcircuit tm6k  rm5 *m5 l=r_length w=r_width
+#elseif defined (METALS6)
+ device rsubcircuit tm6k  rmtp *mtp l=r_length w=r_width
+#endif
+#endif (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9))
+
+ device rsubcircuit ppolyf_s  rpps   *poly allnwell,allpsub error l=r_length w=r_width
+ device rsubcircuit npolyf_s  rnps   *poly allnwell,allpsub error l=r_length w=r_width
+ device rsubcircuit ppolyf_u  rpp    *poly allnwell,allpsub error l=r_length w=r_width
+ device rsubcircuit npolyf_u  rnp    *poly allnwell,allpsub error l=r_length w=r_width
+#ifdef HRPOLY1K
+ device rsubcircuit ppolyf_u_1k hires *poly allnwell,allpsub error l=r_length w=r_width
+ device rsubcircuit ppolyf_u_1k_6p0 mvhires *poly allnwell,allpsub error l=r_length w=r_width
+#endif (HRPOLY1K)
+ device rsubcircuit pplus_u  rpd  *pdiff allnwell error l=r_length w=r_width
+ device rsubcircuit nplus_u  rnd  *ndiff allpsub error l=r_length w=r_width
+ device rsubcircuit pplus_s  rpds *pdiff allnwell error l=r_length w=r_width
+ device rsubcircuit nplus_s  rnds *ndiff allpsub error l=r_length w=r_width
+ device rsubcircuit pplus_u  mvpdiffres *mvpdiff allnwell error l=r_length w=r_width
+ device rsubcircuit nplus_u  mvndiffres *mvndiff allpsub error l=r_length w=r_width
+ device rsubcircuit nwell rnw   nwell allpsub error l=r_length w=r_width
+
+ # The following absorbs the source/drain resistor into a *_dss FET device
+ device subcircuit Short mvndiffres *mvndiff hvnfet,mvnfet allpsub error
+ device subcircuit Short mvpdiffres *mvpdiff hvpfet,mvpfet allnwell error
+ device subcircuit Short ndiffres *ndiff nfet allpsub error
+ device subcircuit Short pdiffres *pdiff pfet allnwell error
+
+ device pdiode diode_pd2nw_03v3     *pdiode allnwell a=area p=pj
+ device ndiode diode_nd2ps_03v3     *ndiode allpsub a=area p=pj
+ device pdiode diode_pd2nw_06v0     *mvpdiode allnwell a=area p=pj
+ device ndiode diode_nd2ps_06v0     *mvndiode allpsub a=area p=pj
+ device ndiode diode_nd2ps_06v0_nvt *mvnndiode allpsub a=area p=pj
+ device pdiode sc_diode		    *schottky *nsd a=area p=pj
+
+#ifdef MIM
+#ifdef METALS6
+ device csubcircuit cap_mim_2f0_m5m6_noshield *mimcap  *m5   l=c_length w=c_width
+#endif
+#ifdef METALS5
+ device csubcircuit cap_mim_2f0_m4m5_noshield *mimcap  *m4   l=c_length w=c_width
+#endif
+#ifdef METALS4
+ device csubcircuit cap_mim_2f0_m3m4_noshield *mimcap  *m3   l=c_length w=c_width
+#endif
+#ifdef METALS3
+ device csubcircuit cap_mim_2f0_m2m3_noshield *mimcap  *m2   l=c_length w=c_width
+#endif
+#endif (MIM)
+
+end

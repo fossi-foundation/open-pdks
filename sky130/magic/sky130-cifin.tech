@@ -1,0 +1,1876 @@
+###
+###	Source file sky130-cifin.tech
+###	Process this file with the preproc.py macro processor
+###
+#----------------------------------------------------------
+# TECHNAME technology file:  cifinput section
+# Included by TECHNAME.tech
+#----------------------------------------------------------
+cifinput
+#-----------------------------------------------------------------------
+# NOTE:  All values in this section MUST be multiples of 25 
+# or else magic will scale below the allowed layout grid size
+#-----------------------------------------------------------------------
+
+style  sky130 variants (),(vendor)
+ scalefactor 10 nanometers
+ gridlimit 5
+
+ options ignore-unknown-layer-labels
+
+#ifndef MIM
+ ignore CAPM
+ ignore CAPM2
+#endif (!MIM)
+#ifndef METAL5
+ ignore MET4,VIA3
+ ignore MET5,VIA4
+#endif
+ ignore NPC
+ ignore SEALID
+ ignore CAPID
+ ignore LDNTM
+ ignore HVNTM
+ ignore POLYMOD
+ ignore LOWTAPDENSITY
+ ignore OUTLINE
+ ignore POLYCUT
+ ignore POLYGATE
+ ignore DIFFCUT
+ ignore HVNWELLID
+ ignore PADDIFFID
+ ignore PADMETALID
+ ignore PADCENTERID
+
+ layer pnp NWELL,WELLTXT,WELLPIN
+ and PNPID
+ labels NWELL
+ labels WELLPIN port
+ labels WELLTXT text
+
+ layer nwell NWELL,WELLTXT,WELLPIN
+ and-not PNPID
+ labels NWELL
+ labels WELLPIN port
+ labels WELLTXT text
+ variants *
+
+ templayer nwellarea NWELL
+ copyup nwelcheck
+
+ # Copy nwell areas up for diffusion checks
+ templayer xnwelcheck nwelcheck
+ copyup nwelcheck
+
+ templayer hvarea HVI
+ copyup hvcheck
+
+ # Copy high-voltage (HVI) areas up for diffusion checks
+ templayer xhvcheck hvcheck
+ copyup hvcheck
+
+ # Always draw pwell under p-tap and n-diff.  This is not always
+ # necessary but works better with deep nwell for correct extraction.
+ layer pwell TAP,DIFF
+ and-not NWELL,nwelcheck
+ grow 130
+ or SUBTXT,SUBPIN
+ grow 420
+ shrink 420
+ labels SUBPIN port
+ labels SUBTXT text
+
+ layer dnwell DNWELL
+ labels DNWELL
+
+ layer isosub SUBCUT
+ labels SUBCUT
+
+ layer npn DNWELL
+ and-not NWELL,nwelcheck
+ and NPNID
+
+ layer photo DNWELL
+ and PHOTO
+
+ layer rpw PWRES
+ and DNWELL
+ labels PWRES
+
+ templayer ndiffarea DIFF,DIFFTXT,DIFFPIN,barediff
+ and-not POLY
+ and-not NWELL,nwelcheck
+ and-not PSDM
+ and-not DIODE
+ and-not DIFFRES
+ and-not HVI,hvcheck
+ and NSDM
+ and-not CORELI
+ copyup ndifcheck
+ labels DIFF
+ labels DIFFPIN port
+ labels DIFFTXT text
+ variants *
+
+ layer ndiff ndiffarea
+
+ # Copy ndiff areas up for contact checks
+ templayer xndifcheck ndifcheck
+ copyup ndifcheck
+
+ templayer mvndiffarea DIFF,DIFFTXT,DIFFPIN,barediff
+ and-not POLY
+ and-not NWELL,nwelcheck
+ and-not PSDM
+ and-not DIODE
+ and-not DIFFRES
+ and HVI,hvcheck
+ and NSDM
+ copyup ndifcheck
+ labels DIFF
+ labels DIFFPIN port
+ labels DIFFTXT text
+
+ layer mvndiff mvndiffarea
+
+ # Copy ndiff areas up for contact checks
+ templayer mvxndifcheck mvndifcheck
+ copyup mvndifcheck
+
+ layer ndiode DIFF,barediff
+ and NSDM
+ and DIODE
+ and-not NWELL,nwelcheck
+ and-not POLY
+ and-not PSDM
+ and-not HVI,hvcheck
+ and-not LVTN
+ labels DIFF
+
+ layer ndiodelvt DIFF,barediff
+ and NSDM
+ and DIODE
+ and-not NWELL,nwelcheck
+ and-not POLY
+ and-not PSDM
+ and-not HVI,hvcheck
+ and LVTN
+ labels DIFF
+
+ templayer ndiodearea DIODE
+ and NSDM
+ and-not HVI,hvcheck
+ and-not NWELL,nwelcheck
+ copyup DIODE,NSDM
+
+ layer ndiffres DIFFRES
+ and NSDM
+ and-not HVI,hvcheck
+ labels DIFF
+
+ templayer pdiffarea DIFF,DIFFTXT,DIFFPIN,barediff
+ and-not POLY
+ and NWELL,nwelcheck
+ and-not NSDM
+ and-not DIODE
+ and-not HVI,hvcheck
+ and PSDM
+ copyup pdifcheck
+ labels DIFF 
+ labels DIFFPIN port
+ labels DIFFTXT text
+
+ layer pdiff pdiffarea
+
+ layer mvndiode DIFF,barediff
+ and NSDM
+ and DIODE
+ and HVI,hvcheck
+ and-not POLY
+ and-not PSDM
+ and-not LVTN
+ labels DIFF
+
+ layer nndiode DIFF,barediff
+ and NSDM
+ and DIODE
+ and HVI,hvcheck
+ and-not POLY
+ and-not PSDM
+ and LVTN
+ labels DIFF
+
+ templayer mvndiodearea DIODE
+ and NSDM
+ and HVI,hvcheck
+ and-not NWELL,nwelcheck
+ copyup DIODE,NSDM
+
+ layer mvndiffres DIFFRES
+ and NSDM
+ and HVI,hvcheck
+ labels DIFF
+
+ # Note: Not checking PSDM specifically, just lack of NSDM
+ templayer mvpdiffarea DIFF,DIFFTXT,DIFFPIN,barediff
+ and-not POLY
+ and NWELL,nwelcheck
+ and-not NSDM
+ and HVI,hvcheck
+ and-not DIODE
+ and-not DIFFRES
+ copyup mvpdifcheck
+ labels DIFF
+ labels DIFFPIN port
+ labels DIFFTXT text
+
+ layer mvpdiff mvpdiffarea
+
+ # Copy pdiff areas up for contact checks
+ templayer xpdifcheck pdifcheck
+ copyup pdifcheck
+
+ layer pdiode DIFF,barediff
+ and PSDM
+ and-not POLY
+ and-not NSDM
+ and-not HVI,hvcheck
+ and-not LVTN
+ and-not HVTP
+ and DIODE
+ labels DIFF
+
+ layer pdiodelvt DIFF,barediff
+ and PSDM
+ and-not POLY
+ and-not NSDM
+ and-not HVI,hvcheck
+ and LVTN
+ and-not HVTP
+ and DIODE
+ labels DIFF
+
+ layer pdiodehvt DIFF,barediff
+ and PSDM
+ and-not POLY
+ and-not NSDM
+ and-not HVI,hvcheck
+ and-not LVTN
+ and HVTP
+ and DIODE
+ labels DIFF
+
+ templayer pdiodearea DIODE
+ and PSDM
+ and-not HVI,hvcheck
+ copyup DIODE,PSDM
+
+ # Define pfet areas as known pdiff, regardless of the presence of a well.
+
+ templayer pfetarea DIFF,barediff
+ and POLY
+ or baretrans
+ and-not NSDM
+ and-not HVI,hvcheck
+
+ layer pfet pfetarea
+ and-not LVTN
+ and-not HVTP
+ and-not STDCELL
+ and-not COREID
+ labels DIFF
+
+ layer scpfet pfetarea
+ and-not LVTN
+ and-not HVTP
+ and STDCELL
+ and-not COREID
+ labels DIFF
+
+ layer scpfethvt pfetarea
+ and-not LVTN
+ and HVTP
+ and STDCELL
+ labels DIFF
+
+ layer ppu pfetarea
+ and-not LVTN
+ and HVTP
+ and COREID
+ # Shrink-grow operation eliminates the smaller parasitie device
+ # shrink 70
+ # grow 70
+ labels DIFF
+
+ layer pfetlvt pfetarea
+ and LVTN
+ labels DIFF
+
+ layer pfetmvt pfetarea
+ and HVTR
+ labels DIFF
+
+ layer pfethvt pfetarea
+ and HVTP
+ and-not STDCELL
+ and-not COREID
+ labels DIFF
+
+ # Always force nwell under pfet (nwell encloses pdiff by 0.18)
+ layer nwell pfetarea
+ and-not COREID
+ grow 180
+
+ # Copy mvpdiff areas up for contact checks
+ templayer mvxpdifcheck mvpdifcheck
+ copyup mvpdifcheck
+
+ layer mvpdiode DIFF,barediff
+ and PSDM
+ and-not POLY
+ and-not NSDM
+ and HVI,hvcheck
+ and DIODE
+ labels DIFF
+
+ templayer mvpdiodearea DIODE
+ and PSDM
+ and HVI,hvcheck
+ copyup DIODE,PSDM
+
+ # Define pfet areas as known pdiff,
+ # regardless of the presence of a
+ # well.
+
+ templayer mvpfetarea DIFF,barediff
+ and POLY
+ or baretrans
+ and-not NSDM
+ and HVI,hvcheck
+
+ layer mvpfet mvpfetarea
+ and-not ESDID
+ labels DIFF
+
+ layer mvpfetesd mvpfetarea
+ and ESDID
+ labels DIFF
+
+ layer pdiff DIFF,DIFFTXT,DIFFPIN,barediff
+ and-not NSDM
+ and-not POLY
+ and-not HVI,hvcheck
+ and-not DIODE
+ and-not DIFFRES
+ labels DIFF
+ labels DIFFPIN port
+ labels DIFFTXT text
+
+ layer pdiffres DIFFRES
+ and PSDM
+ and NWELL,nwelcheck
+ and-not HVI,hvcheck
+ labels DIFF
+
+ layer nfet DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and-not HVI,hvcheck
+ and-not LVTN
+ and-not SONOS
+ and-not STDCELL
+ and-not COREID
+ labels DIFF
+
+ layer scnfet DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and-not NWELL,nwelcheck
+ and-not HVI,hvcheck
+ and-not LVTN
+ and-not SONOS
+ and STDCELL
+ labels DIFF
+
+ layer scnfetlvt DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and-not NWELL,nwelcheck
+ and-not HVI,hvcheck
+ and LVTN
+ and-not SONOS
+ and STDCELL
+ labels DIFF
+
+ layer npass DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and-not NWELL,nwelcheck
+ and COREID
+ labels DIFF
+
+ layer npd DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and-not NWELL,nwelcheck
+ and COREID
+ # Shrink-grow operation eliminates the smaller npass device
+ shrink 70
+ grow 70
+ labels DIFF
+
+ # Devices abutting tap under gate are officially npd, not npass
+ layer npd TAP
+ grow 100
+ and DIFF
+ and POLY
+ and-not PSDM
+ and NSDM
+ and-not NWELL,nwelcheck
+ and COREID
+ labels DIFF
+
+ layer nfetlvt DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and-not HVI,hvcheck
+ and LVTN
+ and-not SONOS
+ and-not STDCELL
+ labels DIFF
+
+ layer nsonos DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and-not HVI,hvcheck
+ and LVTN
+ and SONOS
+ labels DIFF
+
+ templayer nsdarea TAP,DIFF
+ and NSDM
+ and NWELL,nwelcheck
+ and-not POLY
+ and-not PSDM
+ and-not HVI,hvcheck
+ and-not CORELI
+ copyup nsubcheck
+
+ layer nsd nsdarea
+ labels TAP
+
+ layer nsd TAP,TAPTXT
+ and NSDM
+ and-not POLY
+ and-not HVI,hvcheck
+ labels TAP
+ labels TAPTXT text
+
+ layer corenvar TAP
+ and NSDM
+ and POLY
+ and COREID
+ labels TAP
+
+ templayer nsdexpand nsdarea
+ grow 500
+
+ # Copy nsub areas up for contact checks
+ templayer xnsubcheck nsubcheck
+ copyup nsubcheck
+
+ templayer psdarea TAP,DIFF
+ and PSDM
+ and-not NWELL,nwelcheck
+ and-not POLY
+ and-not NSDM
+ and-not HVI,hvcheck
+ and-not pfetexpand
+ copyup psubcheck
+
+ layer psd psdarea
+ labels TAP
+
+ layer psd TAP
+ and PSDM
+ and-not POLY
+ and-not HVI,hvcheck
+ labels TAP
+ labels TAPTXT text
+
+ layer corepvar TAP
+ and PSDM
+ and POLY
+ and COREID
+ labels TAP
+
+ templayer psdexpand psdarea
+ grow 500
+
+ layer mvpdiff DIFF,DIFFTXT,DIFFPIN,barediff
+ and-not NSDM
+ and-not POLY
+ and HVI,hvcheck
+ and mvpfetexpand
+ labels DIFF
+ labels DIFFPIN port
+ labels DIFFTXT text
+
+ layer mvpdiffres DIFFRES
+ and PSDM
+ and NWELL,nwelcheck
+ and HVI,hvcheck
+ and-not mvrdpioedge
+ labels DIFF
+
+ templayer mvnfetarea DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and-not LVTN
+ and HVI,hvcheck
+ grow 350
+
+ templayer mvnnfetarea DIFF,TAP,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and LVTN
+ and HVI,hvcheck
+ and-not mvnfetarea
+
+ layer mvnfetesd DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and HVI,hvcheck
+ and ESDID
+ and-not mvnnfetarea
+ labels DIFF
+
+ layer mvnfet DIFF,barediff
+ and POLY
+ or baretrans
+ and-not PSDM
+ and NSDM
+ and HVI,hvcheck
+ and-not ESDID
+ and-not mvnnfetarea
+ labels DIFF
+
+ layer nnfet mvnnfetarea
+ and LVID
+ labels DIFF
+
+ layer mvnnfet mvnnfetarea
+ and-not LVID
+ labels DIFF
+
+ templayer mvnsdarea TAP,DIFF
+ and NSDM
+ and NWELL,nwelcheck
+ and-not POLY
+ and-not PSDM
+ and HVI,hvcheck
+ copyup mvnsubcheck
+
+ layer mvnsd mvnsdarea
+ labels TAP
+
+ layer mvnsd TAP,TAPTXT
+ and NSDM
+ and HVI,hvcheck
+ labels TAP
+ labels TAPTXT text
+
+ # Fill in FET under extended drain
+ layer mvpfet EDID
+ and POLY
+ and-not DIFF
+ and-not TAP
+ and-not NWELL
+
+ layer mvnfet EDID
+ and POLY
+ and-not DIFF
+ and-not TAP
+ and NWELL
+
+ # Restrict where nwell is merged
+ templayer ldmos_nwell EDID
+ grow 1200
+ and NWELL
+
+ # Remove or add well under extended FET gate
+ layer nwell EDID
+ and POLY
+ and DIFF
+ and PSDM
+ grow 685
+ or ldmos_nwell
+ grow 420
+ shrink 420
+
+ layer pwell EDID
+ and POLY
+ and DIFF
+ and NSDM
+ grow 660
+ grow 420
+ shrink 420
+
+ layer ed EDID
+ and-not POLY
+ and-not DIFF
+ and-not TAP
+
+ templayer mvnsdexpand mvnsdarea
+ grow 500
+
+ # Copy nsub areas up for contact checks
+ templayer mvxnsubcheck mvnsubcheck
+ copyup mvnsubcheck
+
+ templayer mvpsdarea TAP,DIFF,barediff
+ and PSDM
+ and-not NWELL,nwelcheck
+ and-not POLY
+ and-not NSDM
+ and HVI,hvcheck
+ and-not mvpfetexpand
+ copyup mvpsubcheck
+
+ layer mvpsd mvpsdarea
+ labels DIFF
+
+ layer mvpsd TAP,TAPTXT
+ and PSDM
+ and HVI,hvcheck
+ labels TAP
+ labels TAPTXT text
+
+ templayer mvpsdexpand mvpsdarea
+ grow 500
+
+ # Copy psub areas up for contact checks
+ templayer xpsubcheck psubcheck
+ copyup psubcheck
+
+ templayer mvxpsubcheck mvpsubcheck
+ copyup mvpsubcheck
+
+ layer psd TAP
+ and-not PSDM
+ and-not NSDM
+ and-not POLY
+ and-not HVI,hvcheck
+ and-not pfetexpand
+ and psdexpand
+
+ layer nsd TAP
+ and-not PSDM
+ and-not NSDM
+ and-not POLY
+ and-not HVI,hvcheck
+ and nsdexpand
+
+ layer mvpsd TAP
+ and-not PSDM
+ and-not NSDM
+ and-not POLY
+ and HVI,hvcheck
+ and-not mvpfetexpand
+ and mvpsdexpand
+
+ layer mvnsd TAP
+ and-not PSDM
+ and-not NSDM
+ and-not POLY
+ and HVI,hvcheck
+ and mvnsdexpand
+
+# The following recipes deal with DIFFRES layers expanded over large areas
+# outside the resistor.  Find areas which may have been accidentally
+# captured as a resistor which were supposed to be transistors.
+
+ templayer diffresarea DIFFRES
+ and-not HVI,hvcheck
+ grow 3000
+
+ layer pfet DIFF
+ and diffresarea
+ and POLY
+ and-not NSDM
+ and-not STDCELL
+ and-not HVI
+
+ layer mvpfet DIFF
+ and diffresarea
+ and POLY
+ and-not NSDM
+ and-not STDCELL
+ and HVI
+
+ layer scpfet STDCELL
+ and POLY
+ and diffresarea
+ and DIFF
+ and-not NSDM
+ and-not HVTP
+
+ layer scpfethvt STDCELL
+ and POLY
+ and diffresarea
+ and DIFF
+ and-not NSDM
+ and HVTP
+
+# End of resistor area hack
+
+ templayer xpolyterm RPM,URPM
+ and POLY
+ and-not POLYRES
+ # add back the 0.08um contact surround in the direction of the resistor
+ grow 80
+ and POLY
+
+ layer xpc xpolyterm
+
+ templayer polyarea POLY,POLYTXT,POLYPIN
+ and-not POLYRES
+ and-not POLYSHORT
+ and-not DIFF
+ and-not TAP
+ and-not RPM
+ and-not URPM
+
+ templayer polycontarea polyarea
+ # Remove areas too small for a contact
+ shrink 130
+ grow 130
+ copyup polycheck
+
+ layer poly polyarea
+ labels POLY
+ labels POLYPIN port
+ labels POLYTXT text
+
+ # Copy (non-resistor) poly areas up for contact checks
+ templayer xpolycheck polycheck
+ copyup polycheck
+
+ layer mrp1 POLYRES
+ and POLY
+ and-not RPM
+ and-not URPM
+ labels POLY
+
+ layer rmp POLYSHORT
+ and POLY
+ labels POLY
+
+ layer xhrpoly RPM
+ and POLYRES
+ and POLY
+ and-not URPM
+ and PSDM
+ and NPC
+ and-not xpolyterm
+ labels POLY
+
+ layer uhrpoly URPM
+ and POLYRES
+ and POLY
+ and-not RPM
+ and NPC
+ and-not xpolyterm
+ labels POLY
+
+ templayer ndcbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and NSDM
+ and-not NWELL,nwelcheck
+ and-not HVI,hvcheck
+
+ layer ndc ndcbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or ndcbase
+ labels CONT
+
+ templayer nscbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF,TAP
+ and NSDM
+ and NWELL,nwelcheck
+ and-not HVI,hvcheck
+
+ layer nsc nscbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or nscbase
+ labels CONT
+
+ templayer pdcbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and PSDM
+ and NWELL,nwelcheck
+ and-not HVI,hvcheck
+
+ layer pdc pdcbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pdcbase
+ labels CONT
+
+ templayer pdcnowell CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and PSDM
+ and pfetexpand
+ and-not HVI,hvcheck
+
+ layer pdc pdcnowell
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pdcnowell
+ labels CONT
+
+ templayer pscbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF,TAP
+ and PSDM
+ and-not NWELL,nwelcheck
+ and-not pfetexpand
+ and-not HVI,hvcheck
+
+ layer psc pscbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pscbase
+ labels CONT
+
+ templayer pcbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and POLY
+ and-not DIFF
+ and-not RPM,URPM
+
+ layer pc pcbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pcbase
+ labels CONT
+
+ templayer ndicbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and NSDM
+ and DIODE
+ and-not NWELL,nwelcheck
+ and-not POLY
+ and-not PSDM
+ and-not HVI,hvcheck
+ and-not LVTN
+
+ layer ndic ndicbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or ndicbase
+ labels CONT
+
+ templayer ndilvtcbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and NSDM
+ and DIODE
+ and-not NWELL,nwelcheck
+ and-not POLY
+ and-not PSDM
+ and-not HVI,hvcheck
+ and LVTN
+
+ layer ndilvtc ndilvtcbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or ndilvtcbase
+ labels CONT
+
+ templayer pdicbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and PSDM
+ and DIODE
+ and-not POLY
+ and-not NSDM
+ and-not HVI,hvcheck
+ and-not LVTN
+ and-not HVTP
+
+ layer pdic pdicbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pdicbase
+ labels CONT
+
+ templayer pdilvtcbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and PSDM
+ and DIODE
+ and-not POLY
+ and-not NSDM
+ and-not HVI,hvcheck
+ and LVTN
+ and-not HVTP
+
+ layer pdilvtc pdilvtcbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pdilvtcbase
+ labels CONT
+
+ templayer pdihvtcbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and PSDM
+ and DIODE
+ and-not POLY
+ and-not NSDM
+ and-not HVI,hvcheck
+ and-not LVTN
+ and HVTP
+
+ layer pdihvtc pdihvtcbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pdihvtcbase
+ labels CONT
+
+ templayer mvndcbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and NSDM
+ and-not NWELL,nwelcheck
+ and HVI,hvcheck
+
+ layer mvndc mvndcbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvndcbase
+ labels CONT
+
+ templayer mvnscbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF,TAP
+ and NSDM
+ and NWELL,nwelcheck
+ and HVI,hvcheck
+
+ layer mvnsc mvnscbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvnscbase
+ labels CONT
+
+ # See note above:  Not checking PSDM
+ templayer mvpdcbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and-not NSDM
+ and NWELL,nwelcheck
+ and HVI,hvcheck
+
+ layer mvpdc mvpdcbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvpdcbase
+ labels CONT
+
+ templayer mvpdcnowell CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and PSDM
+ and mvpfetexpand
+ and MET1
+ and HVI,hvcheck
+
+ layer mvpdc mvpdcnowell
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvpdcnowell
+ labels CONT
+
+ # Note: Not checking PSDM specifically, just lack of NSDM
+ templayer mvpscbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF,TAP
+ and-not NSDM
+ and-not NWELL,nwelcheck
+ and-not mvpfetexpand
+ and HVI,hvcheck
+
+ layer mvpsc mvpscbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvpscbase
+ labels CONT
+
+ templayer mvndicbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and NSDM
+ and DIODE
+ and-not POLY
+ and-not PSDM
+ and-not LVTN
+ and HVI,hvcheck
+
+ layer mvndic mvndicbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvndicbase
+ labels CONT
+
+ templayer nndicbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and NSDM
+ and DIODE
+ and-not POLY
+ and-not PSDM
+ and LVTN
+ and HVI,hvcheck
+
+ layer nndic nndicbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or nndicbase
+ labels CONT
+
+ templayer mvpdicbase CONT
+ or barecont
+ and LI
+ or barelicont
+ and DIFF
+ and PSDM
+ and DIODE
+ and-not POLY
+ and-not NSDM
+ and HVI,hvcheck
+
+ layer mvpdic mvpdicbase
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvpdicbase
+ labels CONT
+
+ layer	fomfill  FOMFILL
+ or DIFFFILLALT
+ labels FOMFILL,DIFFFILLALT
+
+ layer	polyfill POLYFILL
+ or POLYFILLALT
+ labels POLYFILL,POLYFILLALT
+
+ layer coreli LI,LITXT,LIPIN
+ and-not LIRES,LISHORT
+ and COREID
+ labels LI
+ labels LIPIN port
+ labels LITXT text
+
+ layer locali LI,LITXT,LIPIN
+ and-not LIRES,LISHORT
+ and-not COREID
+ labels LI
+ labels LIPIN port
+ labels LITXT text
+
+ layer rli LI
+ and LIRES,LISHORT
+ labels LIRES,LISHORT
+
+ layer	lifill LIFILL
+ or LIFILLALT
+ labels LIFILL,LIFILLALT
+
+ layer mcon MCON
+ grow 95
+ shrink 95
+ shrink 85
+ grow 85
+ or MCON
+ labels MCON
+
+ layer m1 MET1,MET1TXT,MET1PIN
+ and-not MET1RES,MET1SHORT
+ labels MET1
+ labels MET1PIN port
+ labels MET1TXT text
+
+ layer rm1 MET1
+ and MET1RES,MET1SHORT
+ labels MET1RES,MET1SHORT
+
+ layer m1fill MET1FILL
+ or MET1FILLALT
+ labels MET1FILL,MET1FILLALT
+
+#ifdef MIM
+ layer mimcap MET3
+ and CAPM
+ labels CAPM
+
+ layer mimcc VIA3
+ and CAPM
+ grow 60
+ grow 40
+ shrink 40
+ labels CAPM
+
+ layer mimcap2 MET4
+ and CAPM2
+ labels CAPM2
+
+ layer mim2cc VIA4
+ and CAPM2
+ grow 190
+ grow 210
+ shrink 210
+ labels CAPM2
+
+#endif (MIM)
+
+#ifdef RERAM
+#undef RERAM
+ # RERAM is drawn as-is
+ layer reram RERAM
+#define RERAM
+#endif (RERAM)
+
+ templayer m2cbase VIA1
+#ifdef RERAM
+#undef RERAM
+ and-not RERAM
+#define RERAM
+#endif (RERAM)
+ and-not COREID
+ grow 5
+ or VIA1
+#ifdef RERAM
+#undef RERAM
+ and-not RERAM
+#define RERAM
+#endif (RERAM)
+ grow 50
+
+ layer m2c m2cbase
+ grow 30
+ shrink 30
+ shrink 130
+ grow 130
+ or m2cbase
+
+ layer m2 MET2,MET2TXT,MET2PIN
+ and-not MET2RES,MET2SHORT
+ labels MET2
+ labels MET2PIN port
+ labels MET2TXT text
+
+ layer rm2 MET2
+ and MET2RES,MET2SHORT
+ labels MET2RES,MET2SHORT
+
+ layer m2fill MET2FILL
+ or MET2FILLALT
+ labels MET2FILL,MET2FILLALT
+
+ templayer m3cbase VIA2
+ grow 40
+
+ layer m3c m3cbase
+ grow 60
+ shrink 60
+ shrink 140 
+ grow 140
+ or m3cbase
+
+ layer m3 MET3,MET3TXT,MET3PIN
+ and-not MET3RES,MET3SHORT
+ labels MET3
+ labels MET3PIN port
+ labels MET3TXT text
+
+ layer rm3 MET3
+ and MET3RES,MET3SHORT
+ labels MET3RES,MET3SHORT
+
+ layer m3fill MET3FILL
+ or MET3FILLALT
+ labels MET3FILL,MET3FILLALT
+
+#ifdef (METAL5)
+
+ templayer via3base VIA3
+#ifdef MIM
+ and-not CAPM
+#endif (MIM)
+ grow 60
+
+ layer via3 via3base
+ grow 40
+ shrink 40
+ shrink 160
+ grow 160
+ or via3base
+
+ layer m4 MET4,MET4TXT,MET4PIN
+ and-not MET4RES,MET4SHORT
+ labels MET4
+ labels MET4PIN port
+ labels MET4TXT text
+
+ layer rm4 MET4
+ and MET4RES,MET4SHORT
+ labels MET4RES,MET4SHORT
+
+ layer m4fill MET4FILL
+ or MET4FILLALT
+ labels MET4FILL,MET4FILLALT
+
+ layer m5 MET5,MET5TXT,MET5PIN
+ and-not MET5RES,MET5SHORT
+ labels MET5
+ labels MET5PIN port
+ labels MET5TXT text
+
+ layer rm5 MET5
+ and MET5RES,MET5SHORT
+ labels MET5RES,MET5SHORT
+
+ layer m5fill MET5FILL
+ or MET5FILLALT
+ labels MET5FILL,MET5FILLALT
+
+ templayer via4base VIA4
+#ifdef MIM
+ and-not CAPM2
+#endif (MIM)
+ grow 190
+
+ layer via4 via4base
+ grow 210
+ shrink 210
+ shrink 590
+ grow 590
+ or via4base
+#endif (METAL5)
+
+#ifdef REDISTRIBUTION
+ layer metrdl RDL,RDLTXT,RDLPIN
+ labels RDL
+ labels RDLPIN port
+ labels RDLTXT text
+#endif
+
+ # Find diffusion not covered in
+ # NSDM or PSDM and pull it into
+ # the next layer up
+
+ templayer gentrans DIFF
+ and-not PSDM
+ and-not NSDM
+ and POLY
+ copyup baretrans
+
+ templayer gendiff DIFF,TAP
+ and-not PSDM
+ and-not NSDM
+ and-not POLY
+ and-not COREID
+ copyup barediff
+
+ # Handle contacts found by copyup
+
+ templayer ndiccopy CONT
+ and LI
+ and DIODE
+ and DIFF
+ and-not NWELL,nwelcheck
+ and NSDM
+ and-not LVTN
+ and-not HVI,hvcheck
+
+ layer ndic ndiccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or ndiccopy
+ labels CONT
+
+ templayer mvndiccopy CONT
+ and LI
+ and DIODE
+ and DIFF
+ and-not NWELL,nwelcheck
+ and NSDM
+ and-not LVTN
+ and HVI,hvcheck
+
+ layer mvndic mvndiccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvndiccopy
+ labels CONT
+
+ templayer pdiccopy CONT
+ and LI
+ and DIODE
+ and DIFF
+ and PSDM
+ and-not HVI,hvcheck
+
+ layer pdic pdiccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pdiccopy
+ labels CONT
+
+ templayer mvpdiccopy CONT
+ and LI
+ and DIODE
+ and PSDM
+ and HVI,hvcheck
+
+ layer mvpdic mvpdiccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvpdiccopy
+ labels CONT
+
+ templayer ndccopy CONT
+ and ndifcheck
+
+ layer ndc ndccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or ndccopy
+ labels CONT
+
+ templayer mvndccopy CONT
+ and mvndifcheck
+
+ layer mvndc mvndccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvndccopy
+ labels CONT
+
+ templayer pdccopy CONT
+ and pdifcheck
+
+ layer pdc pdccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pdccopy
+ labels CONT
+
+ templayer mvpdccopy CONT
+ and mvpdifcheck
+
+ layer mvpdc mvpdccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvpdccopy
+ labels CONT
+
+ templayer pccopy CONT
+ and polycheck
+
+ layer pc pccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or pccopy
+ labels CONT
+
+ templayer nsccopy CONT
+ and nsubcheck
+
+ layer nsc nsccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or nsccopy
+ labels CONT
+
+ templayer mvnsccopy CONT
+ and mvnsubcheck
+
+ layer mvnsc mvnsccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvnsccopy
+ labels CONT
+
+ templayer psccopy CONT
+ and psubcheck
+
+ layer psc psccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or psccopy
+ labels CONT
+
+ templayer mvpsccopy CONT
+ and mvpsubcheck
+
+ layer mvpsc mvpsccopy
+ grow 85
+ shrink 85
+ shrink 85
+ grow 85
+ or mvpsccopy
+ labels CONT
+
+ # Find contacts not covered in
+ # metal and pull them into the
+ # next layer up
+ 
+ templayer barelicont CONT
+ and LI
+ and-not DIFF,TAP
+ and-not POLY
+ and-not DIODE
+ and-not nsubcheck
+ and-not psubcheck
+ and-not mvnsubcheck
+ and-not mvpsubcheck
+ and-not CORELI
+ copyup barelicont
+
+ templayer barecont CONT
+ and-not LI
+ and-not nsubcheck
+ and-not psubcheck
+ and-not mvnsubcheck
+ and-not mvpsubcheck
+ and-not CORELI
+ copyup barecont
+
+ layer glass GLASS,PADTXT,PADPIN
+ labels GLASS
+ labels PADPIN port
+ labels PADTXT text
+
+ templayer boundary BOUND,STDCELL,PADCELL
+ boundary
+
+ layer comment LVSTEXT
+ labels LVSTEXT text
+
+ layer comment TTEXT
+ labels TTEXT text
+
+# Do not infer generic "fillblock" from GDS input
+# layer fillblock  FILLOBSM5
+# and FILLOBSM1,FILLOBSM2,FILLOBSM3,FILLOBSM4
+
+# Use the obstruction types for fill block on individual layers
+ templayer obspoly FILLOBSPOLY,POLYBLOCK
+ and-not POLY
+ labels FILLOBSPOLY
+
+ layer obsactive FILLOBSFOM,DIFFBLOCK
+ and-not DIFF,TAP
+ or obspoly
+ labels FILLOBSFOM
+
+ layer obsli LIBLOCK
+ and-not LI
+ labels LIBLOCK
+
+ layer obsm1 FILLOBSM1,MET1BLOCK
+ and-not MET1
+ labels FILLOBSM1,MET1BLOCK
+
+ layer obsm2 FILLOBSM2,MET2BLOCK
+ and-not MET2
+ labels FILLOBSM2,MET2BLOCK
+
+ layer obsm3 FILLOBSM3,MET3BLOCK
+ and-not MET3
+ labels FILLOBSM3,MET3BLOCK
+
+ layer obsm4 FILLOBSM4,MET4BLOCK
+ and-not MET4
+ labels FILLOBSM4,MET4BLOCK
+
+ layer obsm5 FILLOBSM5,MET5BLOCK
+ and-not MET5
+ labels FILLOBSM5,MET5BLOCK
+
+# MOS Varactor
+
+ layer var POLY
+ and TAP
+ and NSDM
+ and NWELL,nwelcheck
+ and-not HVI,hvcheck
+ and-not HVTP
+ # NOTE:  Else forms a varactor that is not in the vendor netlist.
+ and-not COREID
+ labels POLY
+
+ layer varhvt POLY
+ and TAP
+ and NSDM
+ and NWELL,nwelcheck
+ and-not HVI,hvcheck
+ and HVTP
+ labels POLY
+
+ layer mvvar POLY
+ and TAP
+ and NSDM
+ and NWELL,nwelcheck
+ and HVI,hvcheck
+ labels POLY
+
+ calma NWELL 64 20
+ calma DIFF 65 20
+ calma TAP  65 44
+ calma DNWELL 64 18
+ calma SUBCUT 81 53
+ calma PWRES 64 13
+ # LVTN
+ calma LVTN 125 44
+ # HVTR
+ calma HVTR 18 20
+ # HVTP
+ calma HVTP 78 44
+ # SONOS (TUNM)
+ calma SONOS 80 20
+ # NSDM (NPLUS)
+ calma NSDM 93 44
+ # PSDM (PPLUS)
+ calma PSDM 94 20
+ # HVI (THKOX)
+ calma HVI 75 20
+ # EDID
+ calma EDID 81 57
+ # NPC
+ calma NPC 95 20
+ # P+ POLY MASK
+ calma RPM 86 20
+ calma URPM 79 20
+ calma LDNTM 11 44
+ calma HVNTM 125 20
+ # Poly resistor ID mark
+ calma POLYRES 66 13
+ # Diffusion resistor ID mark
+ calma DIFFRES 65 13
+ calma POLY 66 20
+ calma POLYMOD 66 83
+ # 3.3V native FET ID mark
+ calma LVID 81 60
+ # Diode ID mark
+ calma DIODE 81 23
+ # Bipolar NPN mark
+ calma NPNID 82 20
+ # Bipolar PNP mark
+ calma PNPID 82 44
+ # Capacitor ID
+ calma CAPID 82 64
+ # Core area ID mark
+ calma COREID 81 2
+ # Photodiode ID mark
+ calma PHOTO 81 81
+ # Standard cell ID mark
+ calma STDCELL 81 4
+ # Padframe cell ID mark
+ calma PADCELL 81 3
+ # Seal ring ID mark
+ calma SEALID 81 1
+ # Low tap density ID mark
+ calma LOWTAPDENSITY 81 14
+ # ESD area ID
+ calma ESDID 81 19
+ # Various unused layers
+ calma OUTLINE 236 0
+ calma POLYCUT 66 14
+ calma POLYGATE 66 9
+ calma DIFFCUT 65 14
+ calma HVNWELLID 81 63
+ calma PADDIFFID 81 6
+ calma PADMETALID 81 8
+ calma PADCENTERID 81 20
+ 
+ # LICON
+ calma CONT 66 44
+ calma LI   67 20
+ calma MCON 67 44
+
+ calma MET1 68 20
+ calma VIA1 68 44
+#ifdef RERAM
+#undef RERAM
+ calma RERAM 201 20
+#define RERAM
+#endif (RERAM)
+ calma MET2 69 20
+ calma VIA2 69 44
+ calma MET3 70 20
+#ifdef METAL5
+ calma VIA3 70 44
+ calma MET4 71 20
+ calma VIA4 71 44
+ calma MET5 72 20
+#endif
+#ifdef REDISTRIBUTION
+ calma RDL 74 20
+#endif
+ calma GLASS 76 20
+
+ calma SUBTXT  64 59
+ calma PADTXT  76 5
+ calma DIFFTXT 65 6
+ calma TAPTXT  65 5
+ calma WELLTXT 64 5
+ calma LITXT   67 5
+ calma POLYTXT 66 5
+ calma MET1TXT 68 5
+ calma MET2TXT 69 5
+ calma MET3TXT 70 5
+#ifdef METAL5
+ calma MET4TXT 71 5
+ calma MET5TXT 72 5
+#endif
+#ifdef REDISTRIBUTION
+ calma RDLTXT 74 5
+#endif
+
+ calma LIRES 67 13
+ calma MET1RES 68 13
+ calma MET2RES 69 13
+ calma MET3RES 70 13
+#ifdef METAL5
+ calma MET4RES 71 13
+ calma MET5RES 72 13
+#endif
+
+ calma FOMFILL	23 28
+ calma POLYFILL	28 28
+ calma LIFILL   56 28
+ calma MET1FILL 36 28
+ calma MET2FILL 41 28
+ calma MET3FILL 34 28
+#ifdef METAL5
+ calma MET4FILL 51 28
+ calma MET5FILL 59 28
+#endif
+
+ calma POLYSHORT 66 15
+ calma LISHORT 67 15
+ calma MET1SHORT 68 15
+ calma MET2SHORT 69 15
+ calma MET3SHORT 70 15
+#ifdef METAL5
+ calma MET4SHORT 71 15
+ calma MET5SHORT 72 15
+#endif
+
+ calma SUBPIN 122 16
+ calma PADPIN 76 16
+ calma DIFFPIN 65 16
+ calma POLYPIN 66 16
+ calma WELLPIN 64 16
+ calma LIPIN 67 16
+ calma MET1PIN 68 16
+ calma MET2PIN 69 16
+ calma MET3PIN 70 16
+#ifdef METAL5
+ calma MET4PIN 71 16
+ calma MET5PIN 72 16
+#endif
+#ifdef REDISTRIBUTION
+ calma RDLPIN 74 16
+#endif
+
+ calma BOUND 235 4
+
+ calma LVSTEXT 83 44
+
+#ifdef (MIM)
+ calma CAPM 89 44
+ calma CAPM2 97 44
+#endif (MIM)
+
+ # Obstruction (fill block) layers
+ calma FILLOBSFOM  22 24
+ calma FILLOBSPOLY 33 24
+ calma FILLOBSM1  62  24
+ calma FILLOBSM2  105 52
+ calma FILLOBSM3  107 24
+#ifdef METAL5
+ calma FILLOBSM4  112  4
+ calma FILLOBSM5  117  4
+#endif
+
+ # Alternate layer purpose used for fill
+ # which uses the regular layer numbers.
+ calma DIFFFILLALT 65 99
+ calma POLYFILLALT 66 99
+ calma LIFILLALT   67 99
+ calma MET1FILLALT 68 99
+ calma MET2FILLALT 69 99
+ calma MET3FILLALT 70 99
+#ifdef METAL5
+ calma MET4FILLALT 71 99
+ calma MET5FILLALT 72 99
+#endif
+
+ # Alternate layer purpose used for obstruction (fill block)
+ calma DIFFBLOCK  65 98
+ calma POLYBLOCK  66 98
+ calma LIBLOCK    67 98
+ calma MET1BLOCK  68 98
+ calma MET2BLOCK  69 98
+ calma MET3BLOCK  70 98
+#ifdef METAL5
+ calma MET4BLOCK  71 98
+ calma MET5BLOCK  72 98
+#endif
+
+#-----------------------------------------------------------------------
+
+style  rdlimport
+ # This style is for reading shapes generated with the RDL layers
+
+ scalefactor 10 nanometers
+ gridlimit 5
+
+ options ignore-unknown-layer-labels no-reconnect-labels
+
+ layer mrdl RDL
+ layer mrdlc RDLC
+
+ calma RDL 10 0
+ calma RDLC 20 0
+
+end

@@ -1,0 +1,1087 @@
+###
+###	Source file gf180mcu-cifout.tech
+###	Process this file with the preproc.py macro processor
+###
+#----------------------------------------------------------
+# TECHNAME technology file:  cifoutput section
+# Included by TECHNAME.tech
+#----------------------------------------------------------
+cifoutput
+
+#-----------------------------------------------------
+style gdsii
+#-----------------------------------------------------
+ scalefactor 50 nanometers
+ options calma-permissive-labels
+ gridlimit 5
+
+# This section used for actual GDSII output 
+
+#-----------------------------------------------------
+# DNWELL
+#-----------------------------------------------------
+ layer DNWELL	dnwell
+	calma	12 0
+
+#-----------------------------------------------------
+# SUBCUT
+#-----------------------------------------------------
+ layer SUBCUT	isosub
+	calma	23 5
+
+#-----------------------------------------------------
+# NWELL
+#-----------------------------------------------------
+ layer NWELL 	allnwell
+	# Require nwell under n-tap and p-diffusion
+	or	*nsd,*mvnsd,*pdiff,*mvpdiff,allpfets,pdiffres,mvpdiffres
+	labels  allnwell noport
+	close	1000000
+ 	calma 	21 0
+
+ layer NWELLTXT
+	labels  allnwell port
+	calma	21 10
+
+#-----------------------------------------------------
+# PWELL (LVPWELL)
+#-----------------------------------------------------
+ layer PWELL 	allpwell
+ 	labels 	allpwell noport
+ 	calma 	204 0
+
+ layer PWELLTXT
+	labels  allpwell port
+	calma	204 10
+
+#-----------------------------------------------------
+# DIFF (COMP)
+#-----------------------------------------------------
+
+ # LDFETs cut the diffusion under the gate
+ templayer ldbreak1 *ldndiff,*ldpdiff
+	grow 160
+	and hvnfet,hvpfet,mvnfet,mvpfet
+
+ templayer ldbreak hvnfet,hvpfet,mvnfet,mvpfet
+	grow 200
+	and ldndiff,ldpdiff
+	or ldbreak1
+
+ # Additional cut-back of LD diffusion for implant
+ templayer ldbreak2 hvnfet,hvpfet,mvnfet,mvpfet
+	grow 240
+	and ldndiff,ldpdiff
+
+ # Schottky diode drawn as abutting diffusion, but
+ # there is a 0.28um gap between the nsd and the
+ # Schottky diffusion.
+ templayer scsep *nsd
+	grow	280
+
+ layer DIFF 	schottky
+	and-not	scsep
+	or	alldiff
+	and-not	ldbreak
+ 	labels 	alldiff,schottky
+ 	calma 	22 0
+
+ layer DIFFFILL	filldiff
+	labels	filldiff
+	calma	22 4
+
+#-----------------------------------------------------
+# LDFET implants
+#-----------------------------------------------------
+
+ layer MVNSD ldndiff
+	and-not ldbreak2
+	grow 800
+	calma 210 0
+	
+ layer MVPSD ldpdiff
+	and-not ldbreak2
+	grow 800
+	calma 11 39
+
+#-----------------------------------------------------
+# Bipolar ID markers
+#-----------------------------------------------------
+
+ layer BJTDRC nbase
+	grow 580
+	bloat-all pbase dnwell
+	grow 20
+
+ layer BJTLVS nbase
+	grow 580
+	bloat-all pbase dnwell
+	grow 20
+
+#-----------------------------------------------------
+# PPLUS, NPLUS
+#-----------------------------------------------------
+
+#ifdef HRPOLY1K
+ layer RESDEF
+	bloat-or hires,mvhires * 280 poly 0
+	grow 200
+	shrink 200
+ 	calma 110 5
+
+ # hires requires PPLUS around terminals
+ templayer HRTERM
+	bloat-all hires,mvhires *poly
+	and-not hires,mvhires
+
+ layer SBLK
+	bloat-or hires,mvhires * 280 poly 100
+ 	calma 	49 0
+#endif (HRPOLY1K)
+
+ # rnps requires NPLUS surround 0.18um
+ # rnp  requires NPLUS surround 0.3um
+ # rnd  requires NPLUS surround 0.18um
+
+ templayer resnplus
+ 	bloat-all rnp  *poly
+	grow 120
+ 	bloat-all rnps *poly
+ 	bloat-all rnd  *ndiff
+	grow 180
+
+ # standard generation of NPLUS
+
+ templayer nwell_shrink nwell
+	shrink 430
+
+ templayer shortntap *nsd,*mvnsd
+	and-not dnwell
+	and-not nwell_shrink
+	grow 160
+
+ templayer shortdntap dnwell
+	and pwell
+	grow 430
+        and *nsd,*mvnsd
+	grow 160
+
+ layer NPLUS
+        bloat-or *ndif,*ndiode,*nndiode,ndiffres,*mvndif,*mvndiode,*mvnndiode,mvndiffres,*srammvndiff,*sramndiff * 160 allpactivenonfet 0
+        # NOTE:  Rule CO.5a applies to butted contacts but Calibre rule is
+	# implemented for all contacts, so the Calibre rule is being followed.
+        bloat-or nsc,mvnsc * 95
+        bloat-or *nsd,*mvnsd * 20 allpactivenonfet 0
+	bloat-or allnfets,nvar,mvnvar * 230
+	or shortntap,shortdntap
+	or resnplus
+	grow 	200 
+	shrink 200
+	close 350000
+	mask-hints NPLUS
+	calma   32 0
+
+ # rpps requires PPLUS surround 0.18um
+ # rpp  requires PPLUS surround 0.30um
+ # rpd  requires PPLUS surround 0.18um
+
+ templayer respplus
+ 	bloat-all rpp  *poly
+	grow 120
+ 	bloat-all rpps *poly
+ 	bloat-all rpd  *pdiff
+	grow 180
+
+ # standard generation of PPLUS, including hires resistors
+
+ templayer shortptap nwell
+	and-not dnwell
+	grow 430
+	and *psd,*mvpsd
+	grow 160
+
+ templayer pwell_shrink pwell
+	and dnwell
+	shrink 430
+
+ templayer shortdptap *psd,*mvpsd
+	and dnwell
+	and-not pwell_shrink
+	grow 160
+
+ layer PPLUS
+#ifdef HRPOLY1K
+	or HRTERM
+	grow 200
+	and-not RESDEF
+#endif (HRPOLY1K)
+        bloat-or  *pdif,*pdiode,pdiffres,pfet,pcap,*mvpdif,*mvpdiode,mvpdiffres,hvpfet,mvpfet,mvpcap,*srammvpdiff,srammvpfet,*srampdiff,srampfet * 160 allnactivenonfet 0
+        # NOTE:  Rule CO.5b applies to butted contacts but Calibre rule is
+	# implemented for all contacts, so the Calibre rule is being followed.
+        bloat-or psc,mvpsc * 95
+        bloat-or *psd,*mvpsd * 20 allnactivenonfet 0
+	bloat-or allpfets,pvar,mvpvar * 230
+	or shortptap,shortdptap
+	or respplus
+	grow	200
+	shrink	200
+	close 350000
+	mask-hints PPLUS
+	calma	31 0
+
+#------------------------------------------------------
+# DUALGATE (thickox)
+# Note: Rule DV.5 cannot be violated when automatically
+# generated.
+#------------------------------------------------------
+
+ layer DUALGATE
+	# NOTE:  This rule requires satisfying PL.19;  poly cannot
+	# cross a DUALGATE boundary.
+	bloat-all mvhires,allfetsmv *poly
+	# Rule DV.8 (DUALGATE around poly)
+	grow 400
+	# Rule DV.6 (DUALGATE around diff, LV substrate tap excepted)
+	bloat-or allndiffmv * 240 *psd 0
+	bloat-or allpdiffmv * 240 *nsd 0
+	grow 219
+	shrink 219
+	mask-hints DUALGATE
+	calma 55 0
+
+ # DUALGATE completely covers deep nwell
+ layer DUALGATE
+	bloat-all alldiffmv dnwell
+	grow 500
+	grow 219
+	shrink 219
+	calma 55 0
+
+#-----------------------------------------------------
+# NAT
+#-----------------------------------------------------
+
+ layer  NAT	
+	bloat-all *nndiode,nnfet *ndiff
+	bloat-all *mvnndiode,mvnnfet *mvndiff
+	grow 260
+	grow 309
+	shrink 309
+	calma 5 0
+
+#-----------------------------------------------------
+# FET5VDEF
+#-----------------------------------------------------
+
+ # Ensure FET5VDEF surrounds all mv (5V) FET devices.
+ # This ensures that short length devices do not get
+ # flagged for DRC errors.
+
+ layer FET5VDEF
+	bloat-all mvnfet,mvpfet,srammvnfet,srammvpfet \
+		*mvndiff,*mvpdiff,mvndiffres,mvpdiffres,*mvnsd,*mvpsd
+	grow 100
+	calma 112 1
+
+#-----------------------------------------------------
+# POLY
+#-----------------------------------------------------
+ layer POLY 	allpoly
+	close	224000
+ 	labels 	allpoly noport
+ 	calma 	30 0
+
+ layer POLYTXT
+	labels  allpoly port
+	calma	30 10
+
+ layer POLYFILL	fillpoly
+	labels	fillpoly
+	calma	30 4
+
+ layer PLFUSE	efuse
+	calma	125 5
+
+ layer EFUSE	efuse
+	bloat-all efuse *poly
+	calma	80 5
+
+#-----------------------------------------------------
+# CONT
+#-----------------------------------------------------
+# NOTE:  Contact arrays defined at 200 spacing for large array rule (4x4),
+# otherwise spacing is 180
+
+ layer contlarge allcont
+	shrink 615
+	grow 615
+
+ layer CONT allcont
+	and-not contlarge
+ 	squares-grid 5 220 250
+ 	calma 	33 0
+
+ layer CONT allcont
+	and contlarge
+ 	squares-grid 5 220 280
+ 	calma 	33 0
+
+#-----------------------------------------------------
+# MET1
+#-----------------------------------------------------
+ layer MET1 	allm1
+ 	labels 	allm1 noport
+ 	calma 	34 0
+
+ layer MET1TXT
+	labels	allm1 port
+	calma 	34 10
+
+ layer M1BLOCK  obsm1
+	labels	obsm1
+	calma	34 5
+
+ layer M1FILL   fillm1
+	labels	fillm1
+	calma	34 4
+
+#-----------------------------------------------------
+# VIA1
+#-----------------------------------------------------
+ templayer via1large via1
+	shrink 915
+	grow 915
+
+ layer VIA1 	via1
+	and-not via1large
+ 	squares-grid 0 260 260
+ 	calma 	35 0
+
+ layer VIA1 	via1
+	and via1large
+ 	squares-grid 0 260 360
+ 	calma 	35 0
+
+#-----------------------------------------------------
+# MET2
+#-----------------------------------------------------
+ layer MET2 	allm2
+ 	labels 	allm2 noport
+ 	calma 	36 0
+
+ layer MET2TXT
+	labels	allm2 port
+	calma	36 10
+
+ layer M2BLOCK  obsm2
+	labels	obsm2
+	calma	36 5
+
+ layer M2FILL   fillm2
+	labels	fillm2
+	calma	36 4
+
+#ifdef METALS3 || METALA4 || METALS5 || METALS6
+#-----------------------------------------------------
+# VIA2
+#-----------------------------------------------------
+ templayer via2large via2
+	shrink 915
+	grow 915
+
+ layer VIA2 	via2
+	and-not via2large
+ 	squares-grid 10 260 260
+ 	calma 	38 0
+
+ layer VIA2 	via2
+	and via2large
+ 	squares-grid 10 260 360
+ 	calma 	38 0
+
+#ifdef MIM && METALS3
+ layer VIA2 	mimcapc
+ 	squares-grid 40 260 500
+ 	calma 	38 0
+
+#endif (MIM && METALS3)
+
+#-----------------------------------------------------
+# MET3
+#-----------------------------------------------------
+ layer MET3 	allm3
+ 	labels 	allm3 noport
+ 	calma 	42 0
+
+ layer MET3TXT
+	labels	allm3 port
+	calma	42 10
+
+ layer M3BLOCK  obsm3
+	labels	obsm3
+	calma	42 5
+
+ layer M3FILL   fillm3
+	labels	fillm3
+	calma	42 4
+#endif (METALS3 || METALA4 || METALS5 || METALS6)
+
+#ifdef METALS4 || METALS5 || METALS6
+#-----------------------------------------------------
+# VIA3
+#-----------------------------------------------------
+ templayer via3large via3
+	shrink 915
+	grow 915
+
+ layer VIA3	via3
+	and-not via3large
+ 	squares-grid 10 260 260
+ 	calma 	40 0
+
+ layer VIA3	via3
+	and via3large
+ 	squares-grid 10 260 360
+ 	calma 	40 0
+
+#ifdef MIM && METALS4
+ layer VIA3 	mimcapc
+ 	squares-grid 40 260 500
+ 	calma 	40 0
+
+#endif (MIM && METALS4)
+
+#-----------------------------------------------------
+# MET4
+#-----------------------------------------------------
+ layer MET4 	allm4
+ 	labels 	allm4 noport
+ 	calma 	46 0
+
+ layer MET4TXT
+	labels	allm4 port
+	calma	46 10
+
+ layer M4BLOCK  obsm4
+	labels	obsm4
+	calma	46 5
+
+ layer M4FILL   fillm4
+	labels	fillm4
+	calma	46 4
+
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS5 || METALS6
+#-----------------------------------------------------
+# VIA4
+#-----------------------------------------------------
+ templayer via4large via4
+	shrink 915
+	grow 915
+
+ layer VIA4	via4
+	and-not via4large
+ 	squares-grid 10 260 260
+ 	calma 	41 0
+
+ layer VIA4	via4
+	and via4large
+ 	squares-grid 10 260 360
+ 	calma 	41 0
+
+#ifdef (MIM && METALS5)
+ layer VIA4 	mimcapc
+ 	squares-grid 40 260 500
+ 	calma 	41 0
+
+#endif (MIM && METALS5)
+
+#-----------------------------------------------------
+# MET5
+#-----------------------------------------------------
+ layer MET5 	allm5
+ 	labels 	allm5 noport
+ 	calma 	81 0
+
+ layer MET5TXT
+	labels	allm5 port
+	calma	81 10
+
+ layer M5BLOCK  obsm5
+	labels	obsm5
+	calma	81 5
+
+ layer M5FILL   fillm5
+	labels	fillm5
+	calma	81 4
+
+#endif (METALS5 || METALS6)
+
+#ifdef METALS6
+#-----------------------------------------------------
+# VIATP
+#-----------------------------------------------------
+ templayer viatplarge viatp
+	shrink 975
+	grow 975
+
+ layer VIATP	viatp
+	and-not viatplarge
+ 	squares-grid 10 260 260
+ 	calma 	129 0
+
+ layer VIATP	viatp
+	and viatplarge
+ 	squares-grid 10 160 360
+ 	calma 	129 0
+ 
+#ifdef MIM
+ layer VIATP 	mimcapc
+ 	squares-grid 40 260 500
+ 	calma 	129 0
+
+#endif (MIM)
+
+#-----------------------------------------------------
+# METTP
+#-----------------------------------------------------
+
+ layer METTP 	allmtp
+ 	labels 	allmtp noport
+ 	calma 	53 0
+
+ layer	METTPTXT
+	labels	allmtp port
+	calma	53 10
+
+ layer MTPBLOCK  obsmtp
+	labels	obsmtp
+	calma	53 5
+
+ layer MTPFILL  fillmtp
+	labels	fillmtp
+	calma	53 4
+
+#endif (METALS6)
+
+#-----------------------------------------------------
+# GLASS
+#-----------------------------------------------------
+ layer GLASS 	glass
+ 	calma 	37 0
+
+#-----------------------------------------------------
+# PRBNDRY
+#-----------------------------------------------------
+ templayer CELLBOUND
+	boundary
+
+ layer PRBNDRY CELLBOUND
+	calma 0 0 
+
+#ifdef MIM
+#undef MIM
+#-----------------------------------------------------
+# CAPM
+#-----------------------------------------------------
+# NOTE:  MiM bottom plate handled by alias "allm*" when MIM defined
+
+ layer CAPM 	*mimcap
+ 	labels 	mimcap
+ 	calma 	75 0
+
+ layer CAPDEF	*mimcap
+	grow 200
+	calma 	117 5
+
+ layer CAP_LENGTH
+	mask-hints CAP_LENGTH
+	calma	117 10
+
+#define MIM
+#endif (MIM)
+
+#-----------------------------------------------------
+# SBLK
+#-----------------------------------------------------
+
+ layer SBLK
+	bloat-all rnd *nfet
+	bloat-all rpd *pfet
+	bloat-all mvrnd *mvnfet,*hvnfet
+	bloat-all mvrpd *mvpfet,*hvpfet
+	and allfets
+	grow 220
+ 	bloat-or allsblkdev * 0 space/a 220
+	bloat-or allpolysblkres * 0 space/a 280
+ 	grow 	215
+ 	shrink 	215
+	mask-hints SBLK
+ 	calma 	49 0
+
+#-----------------------------------------------------
+# RESDEF MARK
+#-----------------------------------------------------
+# Identify unsalicided drain areas in I/O ESD structures.
+# These are not marked with RESDEF.
+ templayer esd_io
+	bloat-all mvndiffres *mvndiff,hvnfet,mvnfet
+	bloat-all mvpdiffres *mvpdiff,hvpfet,mvpfet
+
+ layer RESDEF allres
+	and-not esd_io
+	calma 110 5
+
+#-----------------------------------------------------
+# METAL RESISTOR IDs
+#-----------------------------------------------------
+ layer MET1RES rm1
+ calma 110 11
+
+ layer MET2RES rm2
+ calma 110 12
+
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ layer MET3RES rm3
+ calma 110 13
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4 || METALS5 || METALS6
+ layer MET4RES rm4
+ calma 110 14
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS5 || METALS6
+ layer MET5RES rm5
+ calma 110 15
+#endif (METALS5 || METALS6)
+
+#ifdef METALS6
+ layer METTPRES rmtp
+ calma 110 16
+#endif (METALS6)
+
+#-----------------------------------------------------
+# DIODE MARK
+#-----------------------------------------------------
+ layer DIODE  alldiode
+ calma 115 5
+
+#-----------------------------------------------------
+# SCHOTTKY MARK
+#-----------------------------------------------------
+ layer SCHOTTKY
+ bloat-all *schottky *nsd
+ grow 160
+ calma 241 0
+
+#-----------------------------------------------------
+# MOSCAP MARK
+#-----------------------------------------------------
+ layer MOSCAP nvar,mvnvar,pvar,mvpvar,ncap,pcap,mvncap,mvpcap
+ calma 166 5
+
+#ifdef HRPOLY1K
+#-----------------------------------------------------
+# HRES
+#-----------------------------------------------------
+ layer HRES
+ bloat-all hires,mvhires *poly
+ grow 400
+ calma 	62 0
+#endif (HRPOLY1K)
+
+#----------------------------------------------------------------------
+# SRAM
+# NOTE:  Do not output SRAMDEF from magic layout.  Only to be used
+# with read-only cells (unless using mask hints).
+#----------------------------------------------------------------------
+ layer SRAMDEF
+ # bloat-all srammvpfet,srammvnfet,*srammvpdiff,*srammvndiff CELLBOUND
+ # bloat-all srampfet,sramnfet,*srampdiff,*sramndiff CELLBOUND
+ mask-hints SRAMDEF
+ calma 108 5
+
+# I/O pads should have latchup and ESD markers;  these are not
+# recognized layers and must be handled with mask hints.
+
+ layer LATCHUP_ID esd_io
+ mask-hints LATCHUP_ID
+ calma 137 5
+
+ layer ESD_ID esd_io
+ mask-hints ESD_ID
+ calma 24 5
+
+#------------------------------------------------------------------------
+# FILLBLOCK (NOTE: two layers define this on active, then poly & metal)
+# FILLOBS (NDMY) is not output under "fillblock" by default and if
+# required should use a mask hint.
+#------------------------------------------------------------------------
+ layer FILLOBS
+ mask-hints NDMY
+ calma	111 5
+
+ layer FILLOBS2 fillblock
+ calma 	152 5
+
+#----------------------------------------------------------
+style metfill
+#----------------------------------------------------------
+# This section used for metal filling output by a sequence
+# of cif paint commands
+
+ scalefactor 50 nanometers
+ options calma-permissive-labels
+ gridlimit 5
+
+#-----------------------------------------------------
+# Fill layer geometry
+#-----------------------------------------------------
+
+ templayer fill_geometry_off0
+	bbox top
+	slots	0 2000 1000 0 2000 1000 1000 0
+
+ templayer fill_geometry_off1
+	bbox top
+	slots	0 2000 1000 0 2000 1000 1000 660
+
+ templayer fill_geometry_off2
+	bbox top
+	slots	0 2000 1000 0 2000 1000 1000 1320
+
+#ifdef THICKMET3P0
+ templayer  fill_geometry_thick
+	bbox    top
+	slots	0 6000 2000 0 6000 2000 3000 2000
+#endif (THICKMET3P0)
+
+#-----------------------------------------------------
+# Obstruction geometry
+#-----------------------------------------------------
+
+ templayer 	obstruct_diff alldiff,schottky,filldiff,obsactive
+	grow 	2010
+	shrink 	500
+	grow 	500
+
+ templayer 	obstruct_poly allpoly,fillpoly
+	grow 	2010
+	shrink 	500
+	grow 	500
+
+ templayer 	obstruct_m1 allm1,allpad,fillm1,obsm1
+	grow 	2010
+	shrink 	500
+	grow 	500
+
+ templayer 	obstruct_m2 allm2,allpad,fillm2,obsm2
+	grow 	2010
+	shrink 	500
+	grow 	500
+
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+ templayer 	obstruct_m3 allm3,allpad,fillm3,obsm3
+	grow 	2010
+	shrink 	500
+	grow 	500
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4 || METALS5 || METALS6
+ templayer 	obstruct_m4 allm4,allpad,fillm4,obsm4
+	grow 	2010
+	shrink 	500
+	grow 	500
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS5 || METALS6
+ templayer 	obstruct_m5 allm5,allpad,fillm5,obsm5
+	grow 	2010
+	shrink 	500
+	grow 	500
+#endif (METALS5 || METALS6)
+
+#ifdef METALS6
+#ifdef THICKMET3P0
+ templayer 	obstruct_mtp allmtp,allpad,fillmtp,obsmtp
+	grow 	2010
+	shrink 	500
+	grow 	500
+
+#elseif THICKMET0P9 || THICKMET1P1
+ templayer 	obstruct_mtp allmtp,allpad,fillmtp,obsmtp
+	grow 	2010
+	shrink 	500
+	grow 	500
+
+#else (!(THICKMET3P0 || THICKMET1P1 || THICKMET0P9 )
+ templayer 	obstruct_mtp allmtp,allpad,fillmtp,obsmtp
+	grow 	2010
+	shrink 	500
+	grow 	500
+#endif
+#endif (METALS6)
+
+#-----------------------------------------------------
+# DIFF FILL
+#-----------------------------------------------------
+ layer difffill fill_geometry_off0
+	shrink 995
+	grow 995
+
+#-----------------------------------------------------
+# POLY FILL
+#-----------------------------------------------------
+ layer polyfill fill_geometry_off1
+	and-not obstruct_m1
+	shrink 995
+	grow 995
+
+#-----------------------------------------------------
+# MET1 FILL
+#-----------------------------------------------------
+ layer met1fill fill_geometry_off2
+	and-not obstruct_poly
+	and-not obstruct_m1
+	and-not obstruct_m2
+	shrink 995
+	grow 995
+
+#-----------------------------------------------------
+# MET2 FILL
+#-----------------------------------------------------
+ layer met2fill fill_geometry_off0
+	and-not obstruct_m1
+	and-not obstruct_m2
+	shrink 995
+	grow 995
+
+#ifdef METALS3 || METALS4 || METALS5 || METALS6
+#-----------------------------------------------------
+# MET3 FILL
+#-----------------------------------------------------
+ layer met3fill fill_geometry_off1
+	and-not obstruct_m2
+	and-not obstruct_m3
+	shrink 995
+	grow 995
+#endif (METALS3 || METALS4 || METALS5 || METALS6)
+
+#ifdef METALS4 || METALS5 || METALS6
+#-----------------------------------------------------
+# MET4 FILL
+#-----------------------------------------------------
+ layer met4fill fill_geometry_off2
+	and-not obstruct_m3
+	and-not obstruct_m4
+	shrink 995
+	grow 995
+#endif (METALS4 || METALS5 || METALS6)
+
+#ifdef METALS5 || METALS6
+#-----------------------------------------------------
+# MET5 FILL
+#-----------------------------------------------------
+ layer met5fill fill_geometry_off0
+	and-not obstruct_m4
+	and-not obstruct_m5
+	shrink 995
+	grow 995
+#endif (METALS5 || METALS6)
+
+#ifdef METALS6
+#-----------------------------------------------------
+# METTP FILL
+#-----------------------------------------------------
+ layer mettpfill fill_geometry_off1
+	and-not obstruct_m5
+	and-not obstruct_mtp
+	shrink 995
+	grow 995
+#endif (METALS6)
+
+#-----------------------------------------------------------------------
+style drc
+#-----------------------------------------------------------------------
+# NOTE:  this style is used for DRC only, not for GDS output
+#-----------------------------------------------------------------------
+
+ scalefactor 50 nanometers
+ options calma-permissive-labels
+ gridlimit 5
+
+ # Check that all p-diff and n-ohmic have either nwell or dnwell
+ templayer missing_nwell *nsd,*mvnsd,*pdiff,*mvpdiff,*pdiode,pdiffres,mvpdiffres,pfet,hvpfet,mvpfet,srammvpfet,srampfet,mvnvaractor
+ and-not dnwell,nwell,pnp
+
+ # Check that all p-ohmic and n-diff have either pwell + dnwell
+ # or nothing.  Can check the pwell surround at the same time.
+
+ templayer pohmic_missing_pwell *psd
+ grow 120
+ and dnwell
+ and-not pwell,pbase
+
+ templayer mvpohmic_missing_pwell *mvpsd,mvpvaractor
+ grow 160
+ and dnwell
+ and-not pwell
+
+ templayer ndiff_missing_pwell *ndiff,*ndiode,ndiffres,nfet,*sramndiff,sramnfet
+ grow 430
+ and dnwell
+ and-not pwell
+
+ templayer mvndiff_missing_pwell *mvndiff,mvndiffres,hvnfet,mvnfet,*srammvndiff,srammvnfet
+ grow 600
+ and dnwell
+ and-not pwell
+
+ # Check for MV and LV devices in the same dnwell
+ templayer mv_dnwell
+ bloat-all alldiffmv,schottky dnwell
+
+ templayer bad_dnwell
+ bloat-all alldifflv dnwell
+ and mv_dnwell
+
+ # Check pwell in dnwell
+ templayer pwell_in_dnwell pwell
+ and dnwell
+ and-not mv_dnwell
+
+ templayer mvpwell_in_dnwell pwell
+ and mv_dnwell
+
+ # Check for MV and LV devices in the same nwell
+ templayer mv_nwell
+ bloat-all alldiffmv nwell
+
+ templayer bad_nwell
+ # All low-voltage diffusion except tap diffusion (nsd, psd)
+ bloat-all *ndif,*ndiode,*nndiode,ndiffres,nfet,nnfet,ncap,*pdif,*pdiode,pdiffres,pfet,pcap,schottky nwell
+ and mv_nwell
+
+ # Check for nwell resistor in deep nwell
+ templayer bad_rnw rnw
+ and dnwell
+
+ # Check for minimum PPLUS and NPLUS area.  NOTE:  These are simplified
+ # versions of the cifoutput rules.
+
+ templayer check_pplus
+        bloat-or  *pdif,*pdiode,pdiffres,pfet,pcap,*mvpdif,*mvpdiode,mvpdiffres,hvpfet,mvpfet,mvpcap,srammvpfet,srampfet * 160 allnactivenonfet 0
+        bloat-or psc,mvpsc * 95
+        bloat-or *psd,*mvpsd * 20 allnactivenonfet 0
+	grow	200
+	shrink	200
+
+ templayer check_nplus
+        bloat-or *ndif,*ndiode,*nndiode,ndiffres,nfet,*mvndif,*mvndiode,*mvnndiode,mvndiffres,hvnfet,hvnfet,mvnfet,*srammvndiff,srammvnfet,*sramndiff,sramnfet * 160 allpactivenonfet 0
+        bloat-or nsc,mvnsc * 95
+        bloat-or *nsd,*mvnsd * 20 allpactivenonfet 0
+	grow 	200 
+	shrink 200
+
+ # Define HRES layer for DRC checks
+ templayer res_hres
+ bloat-all mvhires,hires *poly
+
+ # Check for contact at correct position for HIRES, LRES, PRES resistors
+ templayer res_cont res_hres
+ bloat-all rnp,rpp *poly
+ and pc
+ squares-grid 5 220 250
+
+ templayer res_cont_space_min mvhires,hires
+ # SBLK larger than defined resistor by 0.1um
+ grow 100
+ # SBLK = resistor for rnp and rpp
+ or rnp,rpp
+ # SBLK spacing to contact
+ grow 220
+ and res_cont
+ # If anything remains, contact is too close.
+
+ templayer res_cont_space_max mvhires,hires
+ # SBLK larger than defined resistor by 0.1um
+ grow 100
+ # SBLK = resistor for rnp and rpp
+ or rnp,rpp
+ # SBLK spacing to contact
+ grow 220
+ # size of poly contact
+ grow 220
+ and res_cont
+
+ templayer res_no_cont res_cont
+ and-not res_cont_space_max
+ # If anything remains, contact is too far away
+
+ # Check for HRES to poly and diffusion spacing
+ templayer res_hres_grow res_hres
+ grow 700
+
+ templayer res_diff_space res_hres_grow
+ and alldiff
+ # If anything remains, HRES is too close to diffusion
+
+ templayer res_poly_space res_hres_grow
+ and-not res_hres
+ and allpoly
+ # If anything remains, HRES is too close to poly
+
+ # Check for MiM cap bottom plate to other metal spacing rule (< 1.2um)
+ templayer mim_bottom_plate
+#ifdef METALS3
+ bloat-all *mim *m2
+#endif
+#ifdef METALS4
+ bloat-all *mim *m3
+#endif
+#ifdef METALS5
+ bloat-all *mim *m4
+#endif
+#ifdef METALS6
+ bloat-all *mim *m5
+#endif
+
+ templayer mim_bottom_plate_space mim_bottom_plate
+ grow 1200
+#ifdef METALS3
+ and m2
+#endif
+#ifdef METALS4
+ and m3
+#endif
+#ifdef METALS5
+ and m4
+#endif
+#ifdef METALS6
+ and m5
+#endif
+ and-not mim_bottom_plate
+ # If anything remains, bottom plate is too close
+
+ # Check for MiM cap bottom plate surrounds contact (by 0.4um)
+#ifdef METALS3
+ templayer mim_bot_cont_surround via2
+#endif
+#ifdef METALS4
+ templayer mim_bot_cont_surround via3
+#endif
+#ifdef METALS5
+ templayer mim_bot_cont_surround via4
+#endif
+#ifdef METALS6
+ templayer mim_bot_cont_surround viamt
+#endif
+ and mim_bottom_plate
+ squares-grid 10 260 500
+ grow 400
+ and-not mim_bottom_plate
+ # If anything remains, not enough surround
+
+end
