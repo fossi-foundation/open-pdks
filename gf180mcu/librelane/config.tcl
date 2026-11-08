@@ -186,16 +186,24 @@ set ::env(NETGEN_SETUP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/netgen/$::env(PD
 # Used for parasitics estimation, IR drop analysis, etc
 set ::env(LAYERS_RC) [dict create]
 
-# RC fit from OpenROAD
-# https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/master/flow/platforms/gf180/setRC.tcl
-dict set ::env(LAYERS_RC) "*" Metal2 res 2.25636E-04
-dict set ::env(LAYERS_RC) "*" Metal2 cap 1.35357E-04
-dict set ::env(LAYERS_RC) "*" Metal3 res 2.25636E-04
-dict set ::env(LAYERS_RC) "*" Metal3 cap 1.46141E-04
-dict set ::env(LAYERS_RC) "*" Metal4 res 2.25636E-04
-dict set ::env(LAYERS_RC) "*" Metal4 cap 1.50688E-04
-dict set ::env(LAYERS_RC) "*" Metal5 res 5.85545E-05
-dict set ::env(LAYERS_RC) "*" Metal5 cap 1.55595E-04
+# Per-layer wire RC in the liberty units of the gf180mcu_fd_sc libraries (1ohm, 1pF), i.e. ohm/um and pF/um.
+# Least-squares fit to OpenRCX extraction (rules.openrcx.gf180mcuD.{nom,min,max}) of a routed 5-metal design
+# (13,047 signal nets, 1.77 m of wire, median per-net R error 0.2 %); R agrees with the tech LEF
+# (Metal2-4: 0.090 ohm/sq at 0.28 um = 0.321 ohm/um, Metal5: 0.060 ohm/sq at 0.44 um = 0.136 ohm/um).
+foreach {corner m2r m2c m3r m3c m4r m4c m5r m5c} {
+    nom_* 0.3278 1.524E-04 0.3233 1.713E-04 0.3221 1.374E-04 0.1355 1.989E-04
+    min_* 0.2768 1.359E-04 0.2730 1.522E-04 0.2720 1.238E-04 0.1129 1.776E-04
+    max_* 0.3787 1.724E-04 0.3736 1.939E-04 0.3722 1.537E-04 0.1581 2.228E-04
+} {
+    dict set ::env(LAYERS_RC) $corner Metal2 res $m2r
+    dict set ::env(LAYERS_RC) $corner Metal2 cap $m2c
+    dict set ::env(LAYERS_RC) $corner Metal3 res $m3r
+    dict set ::env(LAYERS_RC) $corner Metal3 cap $m3c
+    dict set ::env(LAYERS_RC) $corner Metal4 res $m4r
+    dict set ::env(LAYERS_RC) $corner Metal4 cap $m4c
+    dict set ::env(LAYERS_RC) $corner Metal5 res $m5r
+    dict set ::env(LAYERS_RC) $corner Metal5 cap $m5c
+}
 
 set ::env(VIAS_R) [dict create]
 
