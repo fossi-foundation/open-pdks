@@ -94,9 +94,9 @@
         "magic": "MAGIC_COMMIT"
     },
     "reference": {
-        "open_pdks": "1fa8856ba7699464219b3c76b5345153ae191149",
+        "open_pdks": "c6df28c1fccb05c286aa0a15e9c4c7dcd8502607",
         "magic": "d157eea7f3c397271a0b6d1e5a98b06101284a13",
-        "sky130_fd_pr": "403964dc7f9cca5ec1a8cc7b4f2a6f532b781676",
+        "sky130_fd_pr": "29b55153fd9f4badef05a02667184b81789d1f61",
         "sky130_fd_io": "3ea30515f909f1c2f7e6ee887e83bd7fb4a78b90",
         "sky130_fd_sc_hs": "c3d7991a9bcb4fc33cbd43262b44bb5560d6fdd0",
         "sky130_fd_sc_ms": "29650994547dd83610ccd0a29bae14d665a9e556",
@@ -112,7 +112,7 @@
         "sky130_fd_bd_sram": "be33adbcf188fdeab5c061699847d9d440f7a084",
         "sky130_fd_pr_reram": "unknown",
         "sky130_ml_xx_hd": "6eb3b0718552b034f1bf1870285ff135e3fb2dcb",
-        "xschem_sky130": "95cbdad0ec5fa457ffb360b6ef5596802c8900ee",
+        "xschem_sky130": "2bfd7d654e12492d47986b78e68bb770e633b5da",
         "klayout_sky130": "4ea0975391feacbdac697bf07029d8908d292613",
         "precheck_sky130": "86b7362dacd931bf1fd957c84501bfbe7955fa7c"
     }
