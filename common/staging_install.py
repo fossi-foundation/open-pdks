@@ -125,7 +125,7 @@ def filter_recursive(tooldir, stagingdir, finaldir):
     elif not os.path.isdir(tooldir):
         return 0
 
-    toolfiles = os.listdir(tooldir)
+    toolfiles = sorted(os.listdir(tooldir))
     total = 0
 
     for file in toolfiles:
@@ -185,8 +185,8 @@ def filter_recursive(tooldir, stagingdir, finaldir):
 
 def remove_target(stagingdir, targetdir, verbose=False):
 
-    slist = os.listdir(stagingdir)
-    tlist = os.listdir(targetdir)
+    slist = sorted(os.listdir(stagingdir))
+    tlist = sorted(os.listdir(targetdir))
 
     for sfile in slist:
         if sfile in tlist:
@@ -268,7 +268,7 @@ def replace_with_symlinks(libfiles, sourcelist):
 def replace_all_with_symlinks(libdir, srclibdir, checklibdir):
     total = 0
     try:
-        libfiles = os.listdir(libdir)
+        libfiles = sorted(os.listdir(libdir))
     except FileNotFoundError:
         print('Cannot list directory ' + libdir)
         print('Called: replace_all_with_symlinks(' + libdir + ', ' + srclibdir + ', ' + checklibdir + ')')
@@ -279,7 +279,7 @@ def replace_all_with_symlinks(libdir, srclibdir, checklibdir):
         return total
 
     try:
-        checkfiles = os.listdir(checklibdir)
+        checkfiles = sorted(os.listdir(checklibdir))
     except FileNotFoundError:
         print('Cannot list check directory ' + checklibdir)
         print('Called: replace_all_with_symlinks(' + libdir + ', ' + srclibdir + ', ' + checklibdir + ')')
@@ -493,7 +493,7 @@ if __name__ == '__main__':
         techdirs.append('/libs.priv/')
 
     for techdir in techdirs:
-        tools = os.listdir(writedir + techdir)
+        tools = sorted(os.listdir(writedir + techdir))
         for tool in tools:
             tooldir = writedir + techdir + tool
 
@@ -523,7 +523,7 @@ if __name__ == '__main__':
         if thispdk != link_from:
             print('Replacing files with symbolic links to ' + link_from + ' where possible.')
             for techdir in techdirs:
-                tools = os.listdir(writedir + techdir)
+                tools = sorted(os.listdir(writedir + techdir))
                 for tool in tools:
                     if tool in noneedcheck:
                         continue
@@ -555,7 +555,7 @@ if __name__ == '__main__':
 
     print('Part 2:  Libraries')
     for refdir in refdirs:
-        libraries = os.listdir(writedir + refdir)
+        libraries = sorted(os.listdir(writedir + refdir))
         for library in libraries:
             print('   ' + library)
             for filetype in needcheck:
@@ -574,14 +574,14 @@ if __name__ == '__main__':
     if link_from == 'source':
         print('Replacing files with symbolic links to source where possible.')
         for refdir in refdirs:
-            libraries = os.listdir(writedir + refdir)
+            libraries = sorted(os.listdir(writedir + refdir))
             for library in libraries:
                 print('   ' + library)
-                filedirs = os.listdir(writedir + refdir + library)
+                filedirs = sorted(os.listdir(writedir + refdir + library))
                 for filedir in filedirs:
                     libdir = writedir + refdir + library + '/' + filedir
                     if os.path.isdir(libdir):
-                        libfiles = os.listdir(libdir)
+                        libfiles = sorted(os.listdir(libdir))
                         if 'sources.txt' in libfiles:
                             # List again, but with full paths.
                             libfiles = glob.glob(libdir + '/*')
@@ -607,10 +607,10 @@ if __name__ == '__main__':
             print('Replacing files with symbolic links to ' + link_from + ' where possible.')
 
             for refdir in refdirs:
-                libraries = os.listdir(writedir + refdir)
+                libraries = sorted(os.listdir(writedir + refdir))
                 for library in libraries:
                     print('   ' + library)
-                    filedirs = os.listdir(writedir + refdir + library)
+                    filedirs = sorted(os.listdir(writedir + refdir + library))
                     for filedir in filedirs:
                         libdir = writedir + refdir + library + '/' + filedir
                         srclibdir = link_from + refdir + library + '/' + filedir
@@ -630,15 +630,15 @@ if __name__ == '__main__':
     print('Removing temporary files from destination.')
 
     for refdir in refdirs:
-        libraries = os.listdir(writedir + refdir)
+        libraries = sorted(os.listdir(writedir + refdir))
         for library in libraries:
-            filedirs = os.listdir(writedir + refdir + library)
+            filedirs = sorted(os.listdir(writedir + refdir + library))
             for filedir in filedirs:
                 filepath = writedir + refdir + library + '/' + filedir
                 if os.path.islink(filepath):
                     continue
                 elif os.path.isdir(filepath):
-                    libfiles = os.listdir(filepath)
+                    libfiles = sorted(os.listdir(filepath))
                     for libfile in libfiles:
                         libfilepath = filepath + '/' + libfile
                         if os.path.islink(libfilepath):

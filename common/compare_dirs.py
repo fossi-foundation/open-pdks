@@ -18,37 +18,37 @@ def compare_dirs(path, styles, formats, debug):
     do_verilog = True if 'verilog' in formats else False
 
     try:
-         d1 = os.listdir(path + '/cdl')
+         d1 = sorted(os.listdir(path + '/cdl'))
     except:
          d1 = []
     d1e = list(item for item in d1 if os.path.splitext(item)[1] == '.cdl')
     d1r = list(os.path.splitext(item)[0] for item in d1e)
     try:
-        d2 = os.listdir(path + '/gds')
+        d2 = sorted(os.listdir(path + '/gds'))
     except:
         d2 = []
     d2e = list(item for item in d2 if os.path.splitext(item)[1] == '.gds')
     d2r = list(os.path.splitext(item)[0] for item in d2e)
     try:
-        d3 = os.listdir(path + '/lef')
+        d3 = sorted(os.listdir(path + '/lef'))
     except:
         d3 = []
     d3e = list(item for item in d3 if os.path.splitext(item)[1] == '.lef')
     d3r = list(os.path.splitext(item)[0] for item in d3e)
     try:
-        d4 = os.listdir(path + '/mag')
+        d4 = sorted(os.listdir(path + '/mag'))
     except:
         d4 = []
     d4e = list(item for item in d4 if os.path.splitext(item)[1] == '.mag')
     d4r = list(os.path.splitext(item)[0] for item in d4e)
     try:
-        d5 = os.listdir(path + '/maglef')
+        d5 = sorted(os.listdir(path + '/maglef'))
     except:
         d5 = []
     d5e = list(item for item in d5 if os.path.splitext(item)[1] == '.mag')
     d5r = list(os.path.splitext(item)[0] for item in d5e)
     try:
-        d6 = os.listdir(path + '/verilog')
+        d6 = sorted(os.listdir(path + '/verilog'))
     except:
         d6 = []
     d6e = list(item for item in d6 if os.path.splitext(item)[1] == '.v')

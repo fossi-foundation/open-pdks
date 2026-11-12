@@ -17,7 +17,7 @@ import sys
 #-----------------------------------------------------------
 
 def addmodels(modelpath):
-    modelfmts = os.listdir(modelpath)
+    modelfmts = sorted(os.listdir(modelpath))
     files_to_parse = []
     for modelfmt in modelfmts:
         if os.path.isdir(modelpath + '/' + modelfmt):
@@ -205,7 +205,7 @@ def find_everything(pathtop):
     cellspath = pathtop + '/cells'
     modelspath = pathtop + '/models'
 
-    allcells = os.listdir(cellspath)
+    allcells = sorted(os.listdir(cellspath))
 
     subcktrex = re.compile(r'\.subckt[ \t]+([^ \t]+)[ \t]+', re.IGNORECASE)
     includerex = re.compile(r'\.include[ \t]+([^ \t]+)', re.IGNORECASE)
@@ -217,7 +217,7 @@ def find_everything(pathtop):
 
     for cellfile in allcells:
         cellpath = cellspath + '/' + cellfile
-        cellfmts = os.listdir(cellpath)
+        cellfmts = sorted(os.listdir(cellpath))
         files_to_parse = []
         for cellfmt in cellfmts:
             fmtext = os.path.splitext(cellfmt)[1]

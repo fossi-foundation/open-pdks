@@ -298,64 +298,51 @@ def makeuserwritable(filepath):
         os.chmod(filepath, st.st_mode | stat.S_IWUSR)
 
 #----------------------------------------------------------------------------
+# Parse a version string into a key that can be compared with other keys
+# from this routine to find the higher version.  The version number is the
+# first run of digit groups separated by "." or "_", and may have any number
+# of components ("1.2", "1.2.3", "1.2.3.4").  Any leading text (e.g., "v" in
+# "v1.2.3") is ignored.  Trailing zero components are ignored, so that "1.2"
+# and "1.2.0" are equal.  Text following the version number (e.g., "rc1" in
+# "1.2.3rc1") marks a pre-release or variant, which ranks below the same
+# version number with no suffix.  A string with no digits ranks below all
+# version numbers.
+#
+# Returns a tuple (components, is_plain), where "components" is a list of
+# integers and "is_plain" is 1 if there is no text after the version number.
 #----------------------------------------------------------------------------
 
 def parse_version_number(vstring):
-    verex1 = re.compile('[^0-9]*([0-9]+)')
-    verex2 = re.compile('[^0-9]*([0-9]+)[^0-9]*([0-9]+)')
-    verex3 = re.compile('[^0-9]*([0-9]+)[^0-9]*([0-9]+)[^0-9]*([0-9]+)')
-    major = 0
-    minor = 0
-    revision = 0
-    try:
-        vnums = verex3.match(vstring)
-    except:
-        try:
-            vnums = verex2.match(vstring)
-        except:
-            try:
-                vnums = verex1.match(vstring)
-            except:
-                print('Error:  String ' + vstring + ' cannot be parsed as '
-				+ 'a version number.')
-            else:
-                major = int(vnums.group(1))
-        else:
-            major = int(vnums.group(1))
-            minor = int(vnums.group(2))
-    else:
-        major = int(vnums.group(1))
-        minor = int(vnums.group(2))
-        revision = int(vnums.group(3))
+    vmatch = re.match(r'[^0-9]*([0-9]+(?:[._][0-9]+)*)(.*)$', vstring)
+    if not vmatch:
+        return ([], 0)
 
-    return [major, minor, revision]
+    components = [int(item) for item in re.split('[._]', vmatch.group(1))]
+    while len(components) > 1 and components[-1] == 0:
+        components.pop()
+    is_plain = 0 if vmatch.group(2) else 1
+    return (components, is_plain)
 
 #----------------------------------------------------------------------------
+# Return True if version key vkey1 (from parse_version_number()) is a higher
+# version than version key vkey2.  Component lists compare element by
+# element, so "1.10" is higher than "1.9" and "1.2.3.5" is higher than
+# "1.2.3.4";  a plain version is higher than the same version with a suffix.
 #----------------------------------------------------------------------------
 
-def version_compare(vlist1, vlist2):
-    major1 = vlist1[0]
-    major2 = vlist2[0]
-    minor1 = vlist1[1]
-    minor2 = vlist2[1]
-    revision1 = vlist1[2]
-    revision2 = vlist2[2]
-    if major1 > major2:
-        return True
-    elif major1 < major2:
-        return False
-    else:
-        if minor1 > minor2:
-            return True
-        elif minor1 < minor2:
-            return False
-        else:
-            if revision1 > revision2:
-                return True
-            else:
-                return False
+def version_compare(vkey1, vkey2):
+    return vkey1 > vkey2
 
 #----------------------------------------------------------------------------
+# Substitute "%l" in a pathname with the library name, and "%v" with a
+# version string.  "%v" is used where the source PDK or library has a
+# directory whose name contains a version number that changes between
+# releases, so that the build does not need to be told the version.  Every
+# file or directory matching the path up to "%v" is a candidate, and the one
+# with the highest version number (see parse_version_number()) is used.
+# Candidates are taken in natural sort order, and a later candidate replaces
+# an equal one, so that the result does not depend on the order in which
+# the filesystem returns the names.  "%%" is replaced with a literal "%".
 #----------------------------------------------------------------------------
 
 def substitute(pathname, library):
@@ -367,17 +354,16 @@ def substitute(pathname, library):
 
     if '%v' in newpathname:
         vglob = re.sub('%v.*', '*', newpathname)
-        vlibs = glob.glob(vglob)
-        try:
-            vstr = vlibs[0][len(vglob)-1:]
-        except IndexError:
-            pass
-        else:
-            for vlib in vlibs[1:]:
-                vtest = vlib[len(vglob)-1:]
-                if version_compare(parse_version_number(vtest),
-				parse_version_number(vstr)):
-                    vstr = vtest
+        vlibs = natural_sort.natural_sort(glob.glob(vglob))
+        vstr = None
+        vkey = None
+        for vlib in vlibs:
+            vtest = vlib[len(vglob)-1:]
+            vtestkey = parse_version_number(vtest)
+            if vkey is None or not version_compare(vkey, vtestkey):
+                vstr = vtest
+                vkey = vtestkey
+        if vstr is not None:
             newpathname = re.sub('%v', vstr, newpathname)
 
     if '%%' in newpathname:
@@ -543,6 +529,10 @@ if __name__ == '__main__':
     have_gds = False
     have_spice = False
     have_cdl = False
+    # Order in which CDL and SPICE options appear on the command line.  Both
+    # are used to annotate port order, in this order, so that if they
+    # disagree, the netlist type given last takes precedence.
+    netlist_order = []
     have_verilog = False
     have_lib = False
 
@@ -870,8 +860,12 @@ if __name__ == '__main__':
             have_gds = True
         elif option[0] == 'spice' or option[0] == 'spi':
             have_spice = True
+            if 'spice' not in netlist_order:
+                netlist_order.append('spice')
         elif option[0] == 'cdl':
             have_cdl = True
+            if 'cdl' not in netlist_order:
+                netlist_order.append('cdl')
         elif option[0] == 'verilog':
             have_verilog = True
         elif option[0] == 'lib' or option[0] == 'liberty':
@@ -1045,7 +1039,7 @@ if __name__ == '__main__':
                 for exclude in excludelist:
                     if '/' in exclude:
                         # Names come from files in a path that is not the source
-                        excludefiles = os.listdir(os.path.split(exclude)[0])
+                        excludefiles = sorted(os.listdir(os.path.split(exclude)[0]))
                         pattern = os.path.split(exclude)[1]
                         notliblist.extend(fnmatch.filter(excludefiles, pattern))
                     else:
@@ -1067,7 +1061,7 @@ if __name__ == '__main__':
             for nocopy in nocopylist:
                 if '/' in nocopy:
                     # Names come from files in a path that is not the source
-                    nocopyfiles = os.listdir(os.path.split(nocopy)[0])
+                    nocopyfiles = sorted(os.listdir(os.path.split(nocopy)[0]))
                     pattern = os.path.split(nocopy)[1]
                     nocopynames.extend(fnmatch.filter(nocopyfiles, pattern))
                 else:
@@ -1220,7 +1214,7 @@ if __name__ == '__main__':
             for incname in includelist:
                 if '/' in incname:
                     # Names come from files in a path that is not the source
-                    incfiles = os.listdir(os.path.split(incname)[0])
+                    incfiles = sorted(os.listdir(os.path.split(incname)[0]))
                     pattern = os.path.split(incname)[1]
                     destfilelist.extend(fnmatch.filter(incfiles, pattern))
                 else:
@@ -1346,7 +1340,7 @@ if __name__ == '__main__':
                     os.makedirs(destlibdir)
 
                 print('Moving files in ' + srclibdir + ' to privileged space.')
-                filelist = os.listdir(srclibdir)
+                filelist = sorted(os.listdir(srclibdir))
                 for file in filelist:
                     srcfile = srclibdir + '/' + file
                     destfile = destlibdir + '/' + file
@@ -1552,7 +1546,7 @@ if __name__ == '__main__':
  
                 # Find GDS file names in the source
                 print('Getting GDS file list from ' + srclibdir + '.')
-                gdsfilesraw = os.listdir(srclibdir)
+                gdsfilesraw = sorted(os.listdir(srclibdir))
                 gdsfiles = []
                 for gdsfile in gdsfilesraw:
                     gdsext = os.path.splitext(gdsfile)[1].lower()
@@ -1628,7 +1622,7 @@ if __name__ == '__main__':
                             lefsrcdir = targetdir + lef_reflib + destlib + '/' + lefdirname
                             lefsrclibdir = lefsrcdir
 
-                            leffiles = os.listdir(lefsrclibdir)
+                            leffiles = sorted(os.listdir(lefsrclibdir))
                             leffiles = list(item for item in leffiles if os.path.splitext(item)[1] == '.lef')
                             if len(leffiles) > 0:
                                 lefnames = list(os.path.split(item)[1] for item in leffiles)
@@ -1647,22 +1641,23 @@ if __name__ == '__main__':
                             for leffile in leffiles:
                                 print('lef read ' + lefsrclibdir + '/' + leffile, file=ofile)
                      
-                        # Use CDL or SPICE netlists to set the port order
+                        # Use CDL and/or SPICE netlists to set the port order,
+                        # in the order the options were given on the command line
                         if have_cdl or have_spice:
-                            if have_cdl:
-                                netdir = clibdir
-                            else:
-                                netdir = slibdir
-
-                            # Find CDL/SPICE file names in the source
-                            # Ignore "sources.txt" if it is in the list.
-                            netfiles = os.listdir(netdir)
                             print('puts stdout "Annotating cells from CDL/SPICE"',
 					file=ofile)
-                            for netfile in netfiles:
-                                if os.path.split(netfile)[1] != 'sources.txt':
-                                    print('catch {readspice ' + netdir + '/' + netfile
-						+ '}', file=ofile)
+                            for nettype in netlist_order:
+                                netdir = clibdir if nettype == 'cdl' else slibdir
+                                if not os.path.isdir(netdir):
+                                    continue
+
+                                # Find CDL/SPICE file names in the source
+                                # Ignore "sources.txt" if it is in the list.
+                                netfiles = sorted(os.listdir(netdir))
+                                for netfile in netfiles:
+                                    if os.path.split(netfile)[1] != 'sources.txt':
+                                        print('catch {readspice ' + netdir + '/'
+						+ netfile + '}', file=ofile)
 
                     # print(r'cellname delete \(UNNAMED\)', file=ofile)
                     print('puts stdout "Writing all magic database files"', file=ofile)
@@ -1675,7 +1670,7 @@ if __name__ == '__main__':
                         lefsrcdir = targetdir + lef_reflib + destlib + '/lef'
                         lefsrclibdir = lefsrcdir
 
-                        leffiles = os.listdir(lefsrclibdir)
+                        leffiles = sorted(os.listdir(lefsrclibdir))
                         leffiles = list(item for item in leffiles if os.path.splitext(item)[1] == '.lef')
                         # Create exclude list with glob-style matching using fnmatch
                         if len(leffiles) > 0:
@@ -1708,7 +1703,7 @@ if __name__ == '__main__':
                     elif have_verilog and os.path.isdir(vlibdir):
                         # Get list of abstract views to make from verilog modules
                         # (NOTE:  no way to apply exclude list here!)
-                        vfiles = os.listdir(vlibdir)
+                        vfiles = sorted(os.listdir(vlibdir))
                         vfiles = list(item for item in vfiles if os.path.splitext(item)[1] == '.v')
                         # Create exclude list with glob-style matching using fnmatch
                         if len(vfiles) > 0:
@@ -1738,7 +1733,7 @@ if __name__ == '__main__':
 
                     elif have_cdl and os.path.isdir(clibdir):
                         # Get list of abstract views to make from CDL subcircuits
-                        cfiles = os.listdir(clibdir)
+                        cfiles = sorted(os.listdir(clibdir))
                         cfiles = list(item for item in cfiles if os.path.splitext(item)[1] == '.cdl')
                         # Create exclude list with glob-style matching using fnmatch
                         if len(cfiles) > 0:
@@ -1768,7 +1763,7 @@ if __name__ == '__main__':
 
                     elif have_spice and os.path.isdir(slibdir):
                         # Get list of abstract views to make from SPICE subcircuits
-                        sfiles = os.listdir(slibdir)
+                        sfiles = sorted(os.listdir(slibdir))
                         sfiles = list(item for item in sfiles)
 
                         # Create exclude list with glob-style matching using fnmatch
@@ -1848,7 +1843,7 @@ if __name__ == '__main__':
                 # devices), so check that some exist.
                 lefoutdir = targetdir + lef_reflib + destlib + '/lef'
                 if os.path.isdir(lefoutdir):
-                    for lefname in os.listdir(lefoutdir):
+                    for lefname in sorted(os.listdir(lefoutdir)):
                         if os.path.splitext(lefname)[1].lower() == '.lef':
                             have_lef = True
                             break
@@ -1907,7 +1902,7 @@ if __name__ == '__main__':
             # maglef/ directory for a library that has no LEF files.
             leffiles = []
             if os.path.isdir(srclibdir):
-                leffiles = os.listdir(srclibdir)
+                leffiles = sorted(os.listdir(srclibdir))
                 leffiles = list(item for item in leffiles if os.path.splitext(item)[1].lower() == '.lef')
 
             if len(leffiles) == 0:
@@ -1984,20 +1979,20 @@ if __name__ == '__main__':
                     # present, and to set the port order
 
                     if have_cdl or have_spice:
-                        if have_cdl:
-                            netdir = clibdir
-                        else:
-                            netdir = slibdir
-
-                        # Find CDL/SPICE file names in the source
-                        # Ignore "sources.txt" if it is in the list.
-                        netfiles = os.listdir(netdir)
                         print('puts stdout "Annotating cells from CDL/SPICE"',
 				file=ofile)
-                        for netfile in netfiles:
-                            if os.path.split(netfile)[1] != 'sources.txt':
-                                print('catch {readspice ' + netdir + '/' + netfile
-					+ '}', file=ofile)
+                        for nettype in netlist_order:
+                            netdir = clibdir if nettype == 'cdl' else slibdir
+                            if not os.path.isdir(netdir):
+                                continue
+
+                            # Find CDL/SPICE file names in the source
+                            # Ignore "sources.txt" if it is in the list.
+                            netfiles = sorted(os.listdir(netdir))
+                            for netfile in netfiles:
+                                if os.path.split(netfile)[1] != 'sources.txt':
+                                    print('catch {readspice ' + netdir + '/'
+					+ netfile + '}', file=ofile)
 
                     for lefmacro in lefmacros:
 
@@ -2047,7 +2042,7 @@ if __name__ == '__main__':
                 # Diagnostic
                 print('Annotating files in ' + destlibdir)
                 sys.stdout.flush()
-                magfiles = os.listdir(destlibdir)
+                magfiles = sorted(os.listdir(destlibdir))
                 magfiles = list(item for item in magfiles if os.path.splitext(item)[1] == '.mag')
                 for magroot in magfiles:
                     magname = os.path.splitext(magroot)[0]
@@ -2217,7 +2212,7 @@ if __name__ == '__main__':
                     cdlfiles = [alllibname]
 
             if not cdl_compile_only:
-                cdlfiles = os.listdir(srclibdir)
+                cdlfiles = sorted(os.listdir(srclibdir))
                 cdlfiles = list(item for item in cdlfiles if os.path.splitext(item)[1].lower() == '.cdl')
 
             # The directory with scripts should be in ../common with respect
