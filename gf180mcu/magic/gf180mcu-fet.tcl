@@ -556,6 +556,7 @@ proc gf180mcu::mos_device {parameters} {
     set viasrc 0	;# don't draw source vias
     set viadrn 0	;# don't draw drain vias
     set viagate 0	;# don't draw gate vias
+    set strap 0		;# no strap by default (only for moscaps & varactors)
 
     set drain ""
     set source ""
@@ -1153,6 +1154,9 @@ proc gf180mcu::mos_draw {parameters} {
                     }
                 }
 	    }
+	    # moscaps & varactors:  If strapped, then there is only one
+	    # terminal, so omit the drain.
+	    if {$strap == 1} {dict set parameters drain ""}
             gf180mcu::mos_device $parameters
             box move n ${dy}um
         }
