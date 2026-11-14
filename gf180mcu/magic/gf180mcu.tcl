@@ -73,6 +73,7 @@ namespace eval gf180mcu {
     dict set ruleset diff_poly_space  0.10      ;# Diffusion to poly spacing rule
     dict set ruleset diff_gate_space  0.11      ;# Diffusion to gate poly spacing rule
     dict set ruleset metal_spacing    0.23      ;# Metal1 spacing rule
+    dict set ruleset metal_area	      0.1444    ;# Metal1 minimum area rule
     dict set ruleset mmetal_spacing   0.38      ;# Metal spacing rule (above metal1)
     dict set ruleset sblk_to_cont     0.33      ;# resistor to contact center
     dict set ruleset sblk_diff_space  0.44      ;# resistor to guard ring
