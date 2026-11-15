@@ -831,7 +831,6 @@ style  import
  shrink 140
 
  layer rm1 MET1
- and RESDEF
  and MET1RES
 
  layer m1 MET1,MET1TXT
@@ -850,7 +849,6 @@ style  import
  shrink 130
 
  layer rm2 MET2
- and RESDEF
  and MET2RES
 
  layer m2 MET2,MET2TXT
@@ -866,7 +864,6 @@ style  import
 
 #ifdef METALS3 || METALS4 || METALS5 || METALS6
  layer rm3 MET3
- and RESDEF
  and MET3RES
 
 #ifdef METALS3 && MIM
@@ -905,7 +902,6 @@ style  import
 
 #ifdef METALS4 || METALS5 || METALS6
  layer rm4 MET4
- and RESDEF
  and MET4RES
 
 #ifdef METALS4 && MIM
@@ -944,7 +940,6 @@ style  import
 
 #ifdef METALS5 || METALS6
  layer rm5 MET5
- and RESDEF
  and MET5RES
 
 #ifdef METALS5 && MIM
@@ -983,7 +978,6 @@ style  import
 
 #ifdef METALS6
  layer rmtp METTP
- and RESDEF
  and METTPRES
 
  layer mtp METTP,METTPTXT
@@ -1220,7 +1214,7 @@ style  import
  calma MET1TXT 34 10
  calma M1BLOCK 34 5
  calma M1FILL 34 4
- calma MET2RES 110 11
+ calma MET1RES 110 11
  calma VIA1 35 0
  calma MET2 36 0
  calma MET2TXT 36 10

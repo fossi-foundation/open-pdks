@@ -19,6 +19,9 @@
 #    botc    = Bottom gate contact
 #    guard   = Guard ring
 #
+# (varactors and moscaps)
+#    strap   = Metal strap between source and drain
+#
 # (not user-editable)
 #
 #    lmin    = Gate minimum length
@@ -32,7 +35,7 @@
 
 proc gf180mcu::pfet_03v3_defaults {} {
     return {w 0.220 l 0.280 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.22 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -42,7 +45,7 @@ proc gf180mcu::pfet_03v3_defaults {} {
 
 proc gf180mcu::pfet_05v0_defaults {} {
     return {w 0.3 l 0.5 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.5 wmin 0.3 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -52,7 +55,7 @@ proc gf180mcu::pfet_05v0_defaults {} {
 
 proc gf180mcu::pfet_06v0_defaults {} {
     return {w 0.3 l 0.55 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.55 wmin 0.3 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -62,7 +65,7 @@ proc gf180mcu::pfet_06v0_defaults {} {
 
 proc gf180mcu::pfet_03v3_dss_defaults {} {
     return {w 0.220 l 0.280 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.22 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -72,7 +75,7 @@ proc gf180mcu::pfet_03v3_dss_defaults {} {
 
 proc gf180mcu::pfet_06v0_dss_defaults {} {
     return {w 0.3 l 0.5 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.5 wmin 0.3 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -86,7 +89,7 @@ proc gf180mcu::pfet_06v0_dss_defaults {} {
 
 proc gf180mcu::nfet_03v3_defaults {} {
     return {w 0.220 l 0.280 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.22 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -96,7 +99,7 @@ proc gf180mcu::nfet_03v3_defaults {} {
 
 proc gf180mcu::nfet_05v0_defaults {} {
     return {w 0.3 l 0.6 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.6 wmin 0.3 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -106,7 +109,7 @@ proc gf180mcu::nfet_05v0_defaults {} {
 
 proc gf180mcu::nfet_06v0_defaults {} {
     return {w 0.3 l 0.7 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.7 wmin 0.3 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -116,7 +119,7 @@ proc gf180mcu::nfet_06v0_defaults {} {
 
 proc gf180mcu::nfet_06v0_nvt_defaults {} {
     return {w 0.8 l 1.8 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 1.8 wmin 0.8 \
 		class mosfet full_metal 1 \
 		compatible {nfet_03v3 nfet_05v0 nfet_06v0 nfet_06v0_nvt}}
@@ -124,7 +127,7 @@ proc gf180mcu::nfet_06v0_nvt_defaults {} {
 
 proc gf180mcu::nfet_10v0_asym_defaults {} {
     return {w 4.0 l 0.6 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.6 wmin 4.0 \
 		viasrc 0 viadrn 0 viagate 0 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
@@ -133,7 +136,7 @@ proc gf180mcu::nfet_10v0_asym_defaults {} {
 
 proc gf180mcu::pfet_10v0_asym_defaults {} {
     return {w 4.0 l 0.6 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.6 wmin 4.0 \
 		viasrc 0 viadrn 0 viagate 0 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
@@ -142,7 +145,7 @@ proc gf180mcu::pfet_10v0_asym_defaults {} {
 
 proc gf180mcu::nfet_03v3_dss_defaults {} {
     return {w 0.220 l 0.280 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.22 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -152,7 +155,7 @@ proc gf180mcu::nfet_03v3_dss_defaults {} {
 
 proc gf180mcu::nfet_06v0_dss_defaults {} {
     return {w 0.3 l 0.6 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.6 wmin 0.3 \
 		class mosfet full_metal 1 \
 		viasrc 0 viadrn 0 viagate 0 \
@@ -167,36 +170,36 @@ proc gf180mcu::nfet_06v0_dss_defaults {} {
 
 proc gf180mcu::nmoscap_3p3_defaults {} {
     return {w 1.0 l 1.0 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.22 \
-		viasrc 0 viadrn 0 viagate 0 \
+		viasrc 0 viadrn 0 viagate 0 strap 1 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
 		class mosfet full_metal 1 compatible {nmoscap_3p3 nmoscap_6p0}}
 }
 
 proc gf180mcu::nmoscap_6p0_defaults {} {
     return {w 1.0 l 1.0 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.3 \
-		viasrc 0 viadrn 0 viagate 0 \
+		viasrc 0 viadrn 0 viagate 0 strap 1 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
 		class mosfet full_metal 1 compatible {nmoscap_3p3 nmoscap_6p0}}
 }
 
 proc gf180mcu::pmoscap_3p3_defaults {} {
     return {w 1.0 l 1.0 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.22 \
-		viasrc 0 viadrn 0 viagate 0 \
+		viasrc 0 viadrn 0 viagate 0 strap 1 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
 		class mosfet full_metal 1 compatible {pmoscap_3p3 pmoscap_6p0}}
 }
 
 proc gf180mcu::pmoscap_6p0_defaults {} {
     return {w 1.0 l 1.0 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.3 \
-		viasrc 0 viadrn 0 viagate 0 \
+		viasrc 0 viadrn 0 viagate 0 strap 1 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
 		class mosfet full_metal 1 compatible {pmoscap_3p3 pmoscap_6p0}}
 }
@@ -207,36 +210,36 @@ proc gf180mcu::pmoscap_6p0_defaults {} {
 
 proc gf180mcu::nvaractor_3p3_defaults {} {
     return {w 1.0 l 1.0 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.22 \
-		viasrc 0 viadrn 0 viagate 0 \
+		viasrc 0 viadrn 0 viagate 0 strap 1 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
 		class mosfet full_metal 1 compatible {nvaractor_3p3 nvaractor_6p0}}
 }
 
 proc gf180mcu::nvaractor_6p0_defaults {} {
     return {w 1.0 l 1.0 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.3 \
-		viasrc 0 viadrn 0 viagate 0 \
+		viasrc 0 viadrn 0 viagate 0 strap 1 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
 		class mosfet full_metal 1 compatible {nvaractor_3p3 nvaractor_6p0}}
 }
 
 proc gf180mcu::pvaractor_3p3_defaults {} {
     return {w 1.0 l 1.0 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.22 \
-		viasrc 0 viadrn 0 viagate 0 \
+		viasrc 0 viadrn 0 viagate 0 strap 1 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
 		class mosfet full_metal 1 compatible {pvaractor_3p3 pvaractor_6p0}}
 }
 
 proc gf180mcu::pvaractor_6p0_defaults {} {
     return {w 1.0 l 1.0 m 1 nf 1 diffcov 100 polycov 100 \
-		guard 1 glc 1 grc 1 gtc 0 gbc 0 tbcov 100 rlcov 100 \
+		guard 1 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 \
 		topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.28 wmin 0.3 \
-		viasrc 0 viadrn 0 viagate 0 \
+		viasrc 0 viadrn 0 viagate 0 strap 1 \
 		viagb 0 viagr 0 viagl 0 viagt 0 doports 1 \
 		class mosfet full_metal 1 compatible {pvaractor_3p3 pvaractor_6p0}}
 }
@@ -421,6 +424,9 @@ proc gf180mcu::mos_dialog {device parameters} {
     magic::add_checkbox doverlap "Overlap at diffusion contact" $parameters
     magic::add_checkbox topc "Add top gate contact" $parameters
     magic::add_checkbox botc "Add bottom gate contact" $parameters
+    if {[dict exists $parameters strap]} {
+	magic::add_checkbox strap "Add metal strap across gate" $parameters
+    }
 
     magic::add_checkbox guard "Add guard ring" $parameters
     magic::add_checkbox full_metal "Full metal guard ring" $parameters
@@ -550,6 +556,7 @@ proc gf180mcu::mos_device {parameters} {
     set viasrc 0	;# don't draw source vias
     set viadrn 0	;# don't draw drain vias
     set viagate 0	;# don't draw gate vias
+    set strap 0		;# no strap by default (only for moscaps & varactors)
 
     set drain ""
     set source ""
@@ -572,6 +579,11 @@ proc gf180mcu::mos_device {parameters} {
     if {![dict exists $parameters drain_diff_extension]} {
 	set drain_diff_extension $diff_extension
     }
+
+    # Metal1 is expected to be isolated when vias are drawn over source,
+    # drain, and gate.  Ensure the minimum metal area rule in those cases.
+    # Find the minimum width of an isolated metal1 tab the height of a via.
+    set minmetwidth [/ $metal_area $via_size]
 
     # Draw the diffusion and poly
     pushbox
@@ -739,6 +751,14 @@ proc gf180mcu::mos_device {parameters} {
             box grow s [/ $ch 2]um
         }
         gf180mcu::via1_draw vert
+	set mindiff [/ [- $minmetwidth $ch] 2]
+	if {$mindiff > 0} {
+	    pushbox
+	    box grow n ${mindiff}um
+	    box grow s ${mindiff}um
+	    paint m1
+	    popbox
+	}
         popbox
     }
     set cext [gf180mcu::unionbox $cext [gf180mcu::draw_contact 0 ${cdw} \
@@ -777,6 +797,14 @@ proc gf180mcu::mos_device {parameters} {
             box grow s [/ $ch 2]um
         }
         gf180mcu::via1_draw vert
+	set mindiff [/ [- $minmetwidth $ch] 2]
+	if {$mindiff > 0} {
+	    pushbox
+	    box grow n ${mindiff}um
+	    box grow s ${mindiff}um
+	    paint m1
+	    popbox
+	}
         popbox
     }
     set cext [gf180mcu::unionbox $cext [gf180mcu::draw_contact 0 ${cdw} \
@@ -788,6 +816,28 @@ proc gf180mcu::mos_device {parameters} {
         port make
     }
     popbox
+
+    # Gate strap (for varactors and moscaps)
+    if {$strap == 1} {
+	pushbox
+	box move w ${hl}um
+	box move w ${gate_to_diffcont}um
+	box width [* 2 [+ ${hl} ${gate_to_diffcont}]]um
+	box grow n [/ $cdwfull 2]um
+	box grow s [/ $cdwfull 2]um
+	paint m1
+	# Enforce slotting of large metal
+	set gsh [magic::i2u [box height]]
+	if {$gsh > 30} {
+            box move n [/ $gsh 2]um
+            box move s 1.0um
+            box height 2.0um     ;# Minimum m1 slot width
+            box grow w -${via_size}um
+            box grow e -${via_size}um
+            erase m1
+	}
+	popbox
+    }
 
     # Top poly contact
     if {$topc} {
@@ -819,6 +869,14 @@ proc gf180mcu::mos_device {parameters} {
 	       box move s 0.055um
 	   }
            gf180mcu::via1_draw
+	   set mindiff [/ [- $minmetwidth $cw] 2]
+	   if {$mindiff > 0} {
+	       pushbox
+	       box grow e ${mindiff}um
+	       box grow w ${mindiff}um
+	       paint m1
+	       popbox
+	   }
            popbox
 	}
         set cext [gf180mcu::unionbox $cext [gf180mcu::draw_contact ${cpl} 0 \
@@ -861,6 +919,14 @@ proc gf180mcu::mos_device {parameters} {
 	       box move n 0.055um
 	   }
            gf180mcu::via1_draw
+	   set mindiff [/ [- $minmetwidth $cw] 2]
+	   if {$mindiff > 0} {
+	       pushbox
+	       box grow e ${mindiff}um
+	       box grow w ${mindiff}um
+	       paint m1
+	       popbox
+	   }
            popbox
 	}
         set cext [gf180mcu::unionbox $cext [gf180mcu::draw_contact ${cpl} 0 \
@@ -913,6 +979,7 @@ proc gf180mcu::mos_draw {parameters} {
     set doverlap 1	;# overlap diffusion contacts when tiling
     set dev_sub_dist 0	;# substrate to guard ring, if dev_sub_type defined
     set dev_surround 0	;# substrate/well surrounds device, if no guard ring
+    set strap 0		;# no strap by default (only for varactors/moscaps)
 
     # Set a local variable for each parameter (e.g., $l, $w, etc.)
     foreach key [dict keys $parameters] {
@@ -1087,6 +1154,9 @@ proc gf180mcu::mos_draw {parameters} {
                     }
                 }
 	    }
+	    # moscaps & varactors:  If strapped, then there is only one
+	    # terminal, so omit the drain.
+	    if {$strap == 1} {dict set parameters drain ""}
             gf180mcu::mos_device $parameters
             box move n ${dy}um
         }

@@ -1005,20 +1005,18 @@ style drc
  and res_cont
  # If anything remains, contact is too close.
 
- templayer res_cont_space_max mvhires,hires
+ templayer res_no_cont mvhires,hires
  # SBLK larger than defined resistor by 0.1um
  grow 100
  # SBLK = resistor for rnp and rpp
  or rnp,rpp
- # SBLK spacing to contact
+ # Then add 0.22um for the spacing requirement
  grow 220
- # size of poly contact
- grow 220
- and res_cont
-
- templayer res_no_cont res_cont
- and-not res_cont_space_max
- # If anything remains, contact is too far away
+ and (mvhires,hires,rnp,rpp,poly,pc)/a
+ # Ignore the resistor itself
+ and-not mvhires,hires,rnp,rpp
+ # If there is no interaction, contact is too far away
+ noninteracting res_cont
 
  # Check for HRES to poly and diffusion spacing
  templayer res_hres_grow res_hres
@@ -1034,35 +1032,67 @@ style drc
  # If anything remains, HRES is too close to poly
 
  # Check for MiM cap bottom plate to other metal spacing rule (< 1.2um)
- templayer mim_bottom_plate
+ # MiM cap bottom plate defined as MiM cap expanded 1.06um ANDed with
+ # the bottom plate material.
+ templayer mim_bottom_plate *mim
+ repeat 3
+ grow 280
 #ifdef METALS3
- bloat-all *mim *m2
+ and-not *m2,*mim
 #endif
 #ifdef METALS4
- bloat-all *mim *m3
+ and-not *m3,*mim
 #endif
 #ifdef METALS5
- bloat-all *mim *m4
+ and-not *m4,*mim
 #endif
 #ifdef METALS6
- bloat-all *mim *m5
+ and-not *m5,*mim
+#endif
+ endrepeat
+ grow 220
+#ifdef METALS3
+ and-not *m2,*mim
+#endif
+#ifdef METALS4
+ and-not *m3,*mim
+#endif
+#ifdef METALS5
+ and-not *m4,*mim
+#endif
+#ifdef METALS6
+ and-not *m5,*mim
+#endif
+
+ templayer mim_bottom_plate_all
+#ifdef METALS3
+ bloat-all mim_bottom_plate *m2
+#endif
+#ifdef METALS4
+ bloat-all mim_bottom_plate *m3
+#endif
+#ifdef METALS5
+ bloat-all mim_bottom_plate *m4
+#endif
+#ifdef METALS6
+ bloat-all mim_bottom_plate *m5
 #endif
 
  templayer mim_bottom_plate_space mim_bottom_plate
  grow 1200
 #ifdef METALS3
- and m2
+ and *m2
 #endif
 #ifdef METALS4
- and m3
+ and *m3
 #endif
 #ifdef METALS5
- and m4
+ and *m4
 #endif
 #ifdef METALS6
- and m5
+ and *m5
 #endif
- and-not mim_bottom_plate
+ and-not mim_bottom_plate_all
  # If anything remains, bottom plate is too close
 
  # Check for MiM cap bottom plate surrounds contact (by 0.4um)
