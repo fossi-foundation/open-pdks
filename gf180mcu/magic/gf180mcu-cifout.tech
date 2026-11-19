@@ -626,8 +626,11 @@ style gdsii
 # Identify unsalicided drain areas in I/O ESD structures.
 # These are not marked with RESDEF.
  templayer esd_io
+	bloat-all ndiffres *ndiff,nfet
+	bloat-all pdiffres *pdiff,pfet
 	bloat-all mvndiffres *mvndiff,hvnfet,mvnfet
 	bloat-all mvpdiffres *mvpdiff,hvpfet,mvpfet
+	interacting allfets
 
  layer RESDEF allres
 	and-not esd_io
