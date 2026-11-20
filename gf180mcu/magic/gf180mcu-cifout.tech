@@ -618,17 +618,33 @@ style gdsii
 # SBLK
 #-----------------------------------------------------
 
+ templayer fet_dss_both nfet,mvnfet,hvnfet,pfet,mvpfet,hvpfet
+	noninteracting *ndiff,*mvndiff,*pdiff,*mvpdiff
+
  layer SBLK
-	bloat-all rnd *nfet
-	bloat-all rpd *pfet
-	bloat-all mvrnd *mvnfet,*hvnfet
-	bloat-all mvrpd *mvpfet,*hvpfet
-	and allfets
+	# Handle the DSS fets with no gate salicidation
+	# (this only covers the gate and its extension)
+	or fet_dss_both
 	grow 220
- 	bloat-or allsblkdev * 0 space/a 220
+	and poly,fet_dss_both
+
+	# Cover the diffusions.
+	# This covers all non salicided diffusions (resistors & DSS fets) and
+	# adds the required 5nm extension into the gate for DSS FETs with
+	# partial gate salicide
+	bloat-or rnd * 0 nfet 50 poly 220 space/a 220
+	bloat-or rpd * 0 pfet 50 poly 220 space/a 220
+	bloat-or mvrnd * 0 mvnfet,hvnfet 50 poly 220 space/a 220
+	bloat-or mvrpd * 0 mvpfet,hvpfet 50 poly 220 space/a 220
+
+	# Handle poly resistors
 	bloat-or allpolysblkres * 0 space/a 280
+
+	# Merging or nearby zones
  	grow 	215
  	shrink 	215
+
+	# Output
 	mask-hints SBLK
  	calma 	49 0
 
