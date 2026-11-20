@@ -139,15 +139,21 @@ style gdsii
  	calma 	49 0
 #endif (HRPOLY1K)
 
- # rnps requires NPLUS surround 0.18um
- # rnp  requires NPLUS surround 0.3um
- # rnd  requires NPLUS surround 0.18um
+ # rnps         requires NPLUS surround 0.18um
+ # rnp          requires NPLUS surround 0.3um
+ # rnd,mvrnd    requires NPLUS surround 0.18um
+ # dss_fet gate requires NPLUS surround 0.18um
+
+ templayer nfet_dss_any_gate nfet,mvnfet,hvnfet
+	interacting rnd,mvrnd
+	grow 220
+	and poly
 
  templayer resnplus
  	bloat-all rnp  *poly
 	grow 120
  	bloat-all rnps *poly
- 	bloat-all rnd  *ndiff
+	or rnd,mvrnd,nfet_dss_any_gate
 	grow 180
 
  # standard generation of NPLUS
@@ -181,15 +187,21 @@ style gdsii
 	mask-hints NPLUS
 	calma   32 0
 
- # rpps requires PPLUS surround 0.18um
- # rpp  requires PPLUS surround 0.30um
- # rpd  requires PPLUS surround 0.18um
+ # rpps         requires PPLUS surround 0.18um
+ # rpp          requires PPLUS surround 0.30um
+ # rpd,mvrpd    requires PPLUS surround 0.18um
+ # dss_fet gate requires PPLUS surround 0.18um
+
+ templayer pfet_dss_any_gate pfet,mvpfet,hvpfet
+	interacting rpd,mvrpd
+	grow 220
+	and poly
 
  templayer respplus
  	bloat-all rpp  *poly
 	grow 120
  	bloat-all rpps *poly
- 	bloat-all rpd  *pdiff
+	or rpd,mvrpd,pfet_dss_any_gate
 	grow 180
 
  # standard generation of PPLUS, including hires resistors
@@ -606,17 +618,33 @@ style gdsii
 # SBLK
 #-----------------------------------------------------
 
+ templayer fet_dss_both nfet,mvnfet,hvnfet,pfet,mvpfet,hvpfet
+	noninteracting *ndiff,*mvndiff,*pdiff,*mvpdiff
+
  layer SBLK
-	bloat-all rnd *nfet
-	bloat-all rpd *pfet
-	bloat-all mvrnd *mvnfet,*hvnfet
-	bloat-all mvrpd *mvpfet,*hvpfet
-	and allfets
+	# Handle the DSS fets with no gate salicidation
+	# (this only covers the gate and its extension)
+	or fet_dss_both
 	grow 220
- 	bloat-or allsblkdev * 0 space/a 220
+	and poly,fet_dss_both
+
+	# Cover the diffusions.
+	# This covers all non salicided diffusions (resistors & DSS fets) and
+	# adds the required 5nm extension into the gate for DSS FETs with
+	# partial gate salicide
+	bloat-or rnd * 0 nfet 50 poly 220 space/a 220
+	bloat-or rpd * 0 pfet 50 poly 220 space/a 220
+	bloat-or mvrnd * 0 mvnfet,hvnfet 50 poly 220 space/a 220
+	bloat-or mvrpd * 0 mvpfet,hvpfet 50 poly 220 space/a 220
+
+	# Handle poly resistors
 	bloat-or allpolysblkres * 0 space/a 280
+
+	# Merging or nearby zones
  	grow 	215
  	shrink 	215
+
+	# Output
 	mask-hints SBLK
  	calma 	49 0
 
@@ -626,8 +654,11 @@ style gdsii
 # Identify unsalicided drain areas in I/O ESD structures.
 # These are not marked with RESDEF.
  templayer esd_io
+	bloat-all ndiffres *ndiff,nfet
+	bloat-all pdiffres *pdiff,pfet
 	bloat-all mvndiffres *mvndiff,hvnfet,mvnfet
 	bloat-all mvpdiffres *mvpdiff,hvpfet,mvpfet
+	interacting allfets
 
  layer RESDEF allres
 	and-not esd_io
