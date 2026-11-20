@@ -94,7 +94,7 @@
         "magic": "MAGIC_COMMIT"
     },
     "reference": {
-        "open_pdks": "c6df28c1fccb05c286aa0a15e9c4c7dcd8502607",
+        "open_pdks": "0c1f82326278a0871f0a1fc4bdacf94c88e78e4d",
         "magic": "d157eea7f3c397271a0b6d1e5a98b06101284a13",
         "sky130_fd_pr": "29b55153fd9f4badef05a02667184b81789d1f61",
         "sky130_fd_io": "3ea30515f909f1c2f7e6ee887e83bd7fb4a78b90",
@@ -104,7 +104,7 @@
         "sky130_fd_sc_lp": "091cb454662cc662a14b6c9d48567ada50288591",
         "sky130_fd_sc_hd": "9cb2d7cb8ed4619094263614039a61b6b2d22a88",
         "sky130_fd_sc_hdll": "0ff13a5cac33fa6443c542323e74220113295310",
-        "sky130_fd_sc_hvl": "e5413e01fa071029ba84d9faa98d9acd80e75a38",
+        "sky130_fd_sc_hvl": "ea7aaac22d04eb62d5489d07f05152ec762920f2",
         "sky130_osu_sc_t12": "unknown",
         "sky130_osu_sc_t15": "unknown",
         "sky130_osu_sc_t18": "unknown",
