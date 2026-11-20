@@ -188,13 +188,14 @@ set ::env(LAYERS_RC) [dict create]
 
 # RC fit from OpenROAD
 # https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/blob/master/flow/platforms/gf180/setRC.tcl
-dict set ::env(LAYERS_RC) "*" Metal2 res 2.25636E-04
+# Please note that the unit of resistance is ohm (first Liberty file read).
+dict set ::env(LAYERS_RC) "*" Metal2 res 2.25636E-01
 dict set ::env(LAYERS_RC) "*" Metal2 cap 1.35357E-04
-dict set ::env(LAYERS_RC) "*" Metal3 res 2.25636E-04
+dict set ::env(LAYERS_RC) "*" Metal3 res 2.25636E-01
 dict set ::env(LAYERS_RC) "*" Metal3 cap 1.46141E-04
-dict set ::env(LAYERS_RC) "*" Metal4 res 2.25636E-04
+dict set ::env(LAYERS_RC) "*" Metal4 res 2.25636E-01
 dict set ::env(LAYERS_RC) "*" Metal4 cap 1.50688E-04
-dict set ::env(LAYERS_RC) "*" Metal5 res 5.85545E-05
+dict set ::env(LAYERS_RC) "*" Metal5 res 5.85545E-02
 dict set ::env(LAYERS_RC) "*" Metal5 cap 1.55595E-04
 
 set ::env(VIAS_R) [dict create]
