@@ -187,13 +187,14 @@ set ::env(NETGEN_SETUP) "$::env(PDK_ROOT)/$::env(PDK)/libs.tech/netgen/$::env(PD
 set ::env(LAYERS_RC) [dict create]
 
 # Per-layer wire RC in the liberty units of the gf180mcu_fd_sc libraries (1ohm, 1pF), i.e. ohm/um and pF/um.
-# Least-squares fit to OpenRCX extraction (rules.openrcx.gf180mcuD.{nom,min,max}) of a routed 5-metal design
-# (13,047 signal nets, 1.77 m of wire, median per-net R error 0.2 %); R agrees with the tech LEF
+# Least-squares fit to OpenRCX extraction (rules.openrcx.gf180mcuD.{nom,min,max}) of the five ORFS gf180 designs
+# (aes, aes-hybrid, ibex, jpeg, riscv32i) routed with LibreLane: 27,206 signal nets, 4.54 m of wire, median
+# per-net R error 0.2 %; R agrees with the tech LEF
 # (Metal2-4: 0.090 ohm/sq at 0.28 um = 0.321 ohm/um, Metal5: 0.060 ohm/sq at 0.44 um = 0.136 ohm/um).
 foreach {corner m2r m2c m3r m3c m4r m4c m5r m5c} {
-    nom_* 0.3278 1.524E-04 0.3233 1.713E-04 0.3221 1.374E-04 0.1355 1.989E-04
-    min_* 0.2768 1.359E-04 0.2730 1.522E-04 0.2720 1.238E-04 0.1129 1.776E-04
-    max_* 0.3787 1.724E-04 0.3736 1.939E-04 0.3722 1.537E-04 0.1581 2.228E-04
+    nom_* 0.3277 1.662E-04 0.3232 1.819E-04 0.3212 1.695E-04 0.1348 1.718E-04
+    min_* 0.2767 1.473E-04 0.2730 1.607E-04 0.2713 1.506E-04 0.1123 1.560E-04
+    max_* 0.3786 1.891E-04 0.3735 2.072E-04 0.3712 1.924E-04 0.1573 1.898E-04
 } {
     dict set ::env(LAYERS_RC) $corner Metal2 res $m2r
     dict set ::env(LAYERS_RC) $corner Metal2 cap $m2c
